@@ -628,6 +628,13 @@
             description="Run tests for the Nullness Checker">
     </target>
 
+    <target name="gradualnullness-tests" depends ="jar,build-tests"
+            description="Run tests for the gradualnullness checker">
+        <antcall target="-run-tests">
+            <param name="param" value="tests.GradualNullnessTest"/>
+        </antcall>
+    </target>
+
     <target name="nullness-tests-nojdk"
             depends="jar,jdk.jar.exists,build-tests,nullness-base-tests,nullness-base-tests-with-asserts,nullness-concurrent-tests,nullness-skipuses-tests,nullness-skipdefs-tests,nullness-uninit-tests,nullness-uninit-tests-with-asserts,nullness-assume-assertions-are-enabled-tests,nullness-extra-tests-nojdk,nullness-reflection-tests,nullness-invariantarrays-tests"
             description="Run tests for the Nullness Checker, WITHOUT updating jdkX.jar">
@@ -814,7 +821,7 @@
     </target>
 
     <target name="jtreg-tests-checkers" depends="-def-jtreg,jar"
-            description="Run checker jtreg tests">
+            description="Run jtreg tests">
         <jtreg-tool name="all" tests="."/>
     </target>
 
@@ -1154,7 +1161,7 @@
             </or>
         </condition>
 
-        <fail message="No jdk jars were found in the jdk directory.  At least one annotated JDK (jdk/jdk7.jar or jdk/jdk8.jar) must be built!"
+        <fail message="No jdk jars were found in the jdk directory.  At least one annotated JDK (jdk/jdk[678].jar) must be built!"
               unless="an.annotated.jdk.exists"/>
     </target>
 

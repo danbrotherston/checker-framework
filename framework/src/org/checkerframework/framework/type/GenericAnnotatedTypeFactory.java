@@ -369,42 +369,14 @@ public abstract class GenericAnnotatedTypeFactory<
                             qual.getCanonicalName());
                 } else {
                     defs.addAbsoluteDefault(AnnotationUtils.fromClass(elements, qual),
-                            DefaultLocation.OTHERWISE);
-                    foundDefaultOtherwise = true;
+                        DefaultLocation.OTHERWISE);
+		    foundDefaultOtherwise = true;
                 }
             }
+	}
 
-            // Add defaults for unannotated code if conservative unannotated flag is passed.
-            if (// !checker.hasOption("unsafeDefaultsForUnannotatedBytecode")
-                    // temporarily use unsafe defaults for bytecode, unless option given
-                    checker.hasOption("safeDefaultsForUnannotatedBytecode") ||
-                    // This block may need to be split after safeDefaults... is reverted to unsafeDefaults...
-                    checker.hasOption("useSafeDefaultsForUnannotatedSourceCode")) {
-                DefaultForUnannotatedCode defaultForUnannotated = qual.getAnnotation(DefaultForUnannotatedCode.class);
-
-                if (defaultForUnannotated != null) {
-                    final DefaultLocation [] locations = defaultForUnannotated.value();
-                    defs.addUnannotatedDefaults(AnnotationUtils.fromClass(elements, qual), locations);
-                    // TODO: here and for source code above, should ALL also be handled?
-                    foundDefaultOtherwiseForUnannotatedCode = foundDefaultOtherwiseForUnannotatedCode ||
-                            Arrays.asList(locations).contains(DefaultLocation.OTHERWISE);
-                }
-
-                if (qual.getAnnotation(DefaultQualifierForUnannotatedCode.class) != null) {
-                    if (defaultForUnannotated != null) {
-                        // A type qualifier should either have a DefaultForUnannotatedCode or
-                        // a DefaultQualifierForUnannotatedCode annotation.
-                        ErrorReporter.errorAbort("GenericAnnotatedTypeFactory.createQualifierDefaults: " +
-                                "qualifier has both @DefaultForUnannotatedCode and @DefaultQualifierForUnannotatedCode annotations: " +
-                                qual.getCanonicalName());
-                    } else {
-                        defs.addUnannotatedDefault(AnnotationUtils.fromClass(elements, qual),
-                                    DefaultLocation.OTHERWISE);
-                        foundDefaultOtherwiseForUnannotatedCode = true;
-                    }
-                }
-            }
-        }
+	foundDefaultOtherwiseForUnannotatedCode = addUnannotatedDefaultsToQualifierDefaults(
+            defs, foundDefaultOtherwiseForUnannotatedCode);
 
         // If Unqualified is a supported qualifier, make it the default.
         // This is for convenience only. Maybe remove.
@@ -415,31 +387,47 @@ public abstract class GenericAnnotatedTypeFactory<
                     DefaultLocation.OTHERWISE);
         }
 
-        // Add defaults for unannotated code if conservative unannotated flag is passed and
-        // no defaults were given.
-        if ((// !checker.hasOption("unsafeDefaultsForUnannotatedBytecode")
-                // temporarily use unsafe defaults for bytecode, unless option given
+        return defs;
+    }
+
+    protected boolean addUnannotatedDefaultsToQualifierDefaults(QualifierDefaults defs,
+								boolean foundDefaultOtherwiseForUnannotatedCode) {
+	for (Class<? extends Annotation> qual : getSupportedTypeQualifiers()) {
+	    // Add defaults for unannotated code if conservative unannotated flag is passed.
+	    if (// temporarily use unsafe defaults for bytecode, unless option given.
                 checker.hasOption("safeDefaultsForUnannotatedBytecode") ||
-                // This block may need to be split after safeDefaults... is reverted to unsafeDefaults...
-                checker.hasOption("useSafeDefaultsForUnannotatedSourceCode")) &&
-                !foundDefaultOtherwiseForUnannotatedCode) {
-            Set<? extends AnnotationMirror> tops = this.qualHierarchy.getTopAnnotations();
-            for (AnnotationMirror top : tops) {
-                defs.addUnannotatedDefault(top, DefaultLocation.RETURNS);
-                defs.addUnannotatedDefault(top, DefaultLocation.UPPER_BOUNDS);
-            }
-            Set<? extends AnnotationMirror> bottoms = this.qualHierarchy.getBottomAnnotations();
-            for (AnnotationMirror bot : bottoms) {
-                defs.addUnannotatedDefault(bot, DefaultLocation.PARAMETERS);
-                defs.addUnannotatedDefault(bot, DefaultLocation.LOWER_BOUNDS);
-                defs.addUnannotatedDefault(bot, DefaultLocation.FIELD);
-                // TODO: this isn't simply DefaultLocation.OTHERWISE, because that would
-                // also apply to type declarations, which isn't currently working as desired.
-                // See: https://groups.google.com/d/msg/checker-framework-dev/vk2V6ZFKPLk/v3hENw-e7gsJ
-            }
+                // This block may need to be split after safeDefaults... is
+                // reverted to unsafeDefaults...
+                checker.hasOption("useSafeDefaultsForUnannotatedSourceCode")) {
+
+		DefaultForUnannotatedCode defaultForUnannotated = qual.getAnnotation(DefaultForUnannotatedCode.class);
+
+		if (defaultForUnannotated != null) {
+                    final DefaultLocation [] locations = defaultForUnannotated.value();
+		    defs.addUnannotatedDefaults(AnnotationUtils.fromClass(elements, qual), locations);
+                    // TODO: here and for source code above, should ALL also be
+                    // handled?
+                    foundDefaultOtherwiseForUnannotatedCode = foundDefaultOtherwiseForUnannotatedCode ||
+                        Arrays.asList(locations).contains(DefaultLocation.OTHERWISE);
+		}
+
+		if (qual.getAnnotation(DefaultQualifierForUnannotatedCode.class) != null) {
+		    if (defaultForUnannotated != null) {
+			// A type qualifier should either have a DefaultForUnannotatedCode or
+			// a DefaultQualifierForUnannotatedCode annotation.
+			ErrorReporter.errorAbort("GenericAnnotatedTypeFactory.createQualifierDefaults: " +
+			    "qualifier has both @DefaultForUnannotatedCode and @DefaultQualifierForUnannotatedCode annotations: " +
+   			    qual.getCanonicalName());
+		    } else {
+                        defs.addUnannotatedDefault(AnnotationUtils.fromClass(elements, qual),
+                                                    DefaultLocation.OTHERWISE);
+                        foundDefaultOtherwiseForUnannotatedCode = true;
+		    }
+	      	}
+	    }
         }
 
-        return defs;
+        return foundDefaultOtherwiseForUnannotatedCode;
     }
 
     /**
@@ -496,7 +484,7 @@ public abstract class GenericAnnotatedTypeFactory<
     protected IdentityHashMap<Tree, Store> regularExitStores;
 
     /**
-     * A mapping from methods to a list with all return statements and the
+     * A mapping from methods to their a list with all return statements and the
      * corresponding store.
      */
     protected IdentityHashMap<MethodTree, List<Pair<ReturnNode, TransferResult<Value, Store>>>> returnStatementStores;

@@ -4,12 +4,8 @@ import java.util.LinkedHashSet;
 
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
-import org.checkerframework.common.reflection.qual.ClassBound;
-import org.checkerframework.common.reflection.qual.ClassVal;
-import org.checkerframework.common.reflection.qual.ClassValBottom;
-import org.checkerframework.common.reflection.qual.UnknownClass;
 import org.checkerframework.common.value.ValueChecker;
-import org.checkerframework.framework.qual.TypeQualifiers;
+import org.checkerframework.framework.qual.StubFiles;
 
 /**
  * The ClassVal Checker provides a sound estimate of the binary name of Class
@@ -17,9 +13,7 @@ import org.checkerframework.framework.qual.TypeQualifiers;
  *
  * @checker_framework.manual #methodval-and-classval-checkers ClassVal Checker
  */
-
-@TypeQualifiers({ UnknownClass.class, ClassVal.class, ClassBound.class,
-        ClassValBottom.class })
+@StubFiles({"reflection.astub"})
 public class ClassValChecker extends BaseTypeChecker {
 
     @Override
@@ -29,7 +23,7 @@ public class ClassValChecker extends BaseTypeChecker {
 
     @Override
     protected LinkedHashSet<Class<? extends BaseTypeChecker>> getImmediateSubcheckerClasses() {
-        //Don't call super otherwise MethodVal will be added as a subChecker
+        // Don't call super otherwise MethodVal will be added as a subChecker
         // which creates a circular dependency.
         LinkedHashSet<Class<? extends BaseTypeChecker>> subCheckers = new LinkedHashSet<>();
         subCheckers.add(ValueChecker.class);

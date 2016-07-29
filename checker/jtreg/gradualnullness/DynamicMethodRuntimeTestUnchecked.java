@@ -1,6 +1,6 @@
 public class DynamicMethodRuntimeTestUnchecked {
     DynamicMethodRuntimeTest classUnderTest;
-    
+
     public DynamicMethodRuntimeTestUnchecked(DynamicMethodRuntimeTest classUnderTest) {
 	this.classUnderTest = classUnderTest;
     }

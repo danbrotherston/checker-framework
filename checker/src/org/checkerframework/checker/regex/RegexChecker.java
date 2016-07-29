@@ -3,15 +3,17 @@ package org.checkerframework.checker.regex;
 
 import org.checkerframework.checker.experimental.regex_qual.Regex;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
-import org.checkerframework.framework.qual.DefaultLocation;
+import org.checkerframework.framework.qual.TypeUseLocation;
 import org.checkerframework.framework.util.defaults.QualifierDefaults;
 import org.checkerframework.qualframework.base.CheckerAdapter;
 import org.checkerframework.qualframework.poly.PolyQual.GroundQual;
 import org.checkerframework.qualframework.poly.QualParams;
+import org.checkerframework.framework.qual.StubFiles;
 
 /**
  * {@link CheckerAdapter} for the Regex-Qual-Param type system.
  */
+@StubFiles("apache-xerces.astub")
 public class RegexChecker extends CheckerAdapter<QualParams<Regex>> {
 
     public RegexChecker() {
@@ -25,15 +27,15 @@ public class RegexChecker extends CheckerAdapter<QualParams<Regex>> {
 
     @Override
     public void setupDefaults(QualifierDefaults defaults) {
-        defaults.addAbsoluteDefault(
+        defaults.addCheckedCodeDefault(
                 getTypeMirrorConverter().getAnnotation(
                         new QualParams<>(new GroundQual<>(Regex.BOTTOM))),
-                DefaultLocation.LOWER_BOUNDS);
+                TypeUseLocation.LOWER_BOUND);
 
-        defaults.addAbsoluteDefault(
+        defaults.addCheckedCodeDefault(
                 getTypeMirrorConverter().getAnnotation(
                         new QualParams<>(new GroundQual<>(Regex.TOP))),
-                DefaultLocation.LOCAL_VARIABLE);
+                TypeUseLocation.LOCAL_VARIABLE);
     }
 
 }

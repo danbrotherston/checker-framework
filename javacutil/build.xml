@@ -10,6 +10,7 @@
     <property file="build.${os.name}.properties"/>
     <property file="build.properties"/>
     <property file="${basedir}/../build-common.properties"/>
+    <property name="javadoc.private" value="false"/>
 
     <import file="${basedir}/../build-common.xml"/>
 
@@ -36,11 +37,12 @@
             description="Set properties: filesets and build.uptodate">
         <fileset id="src.files" dir="${src}">
             <include name="**/*.java"/>
+            <exclude name="**/package-info.java"/>
         </fileset>
 
-        <uptodate property="src.files.uptodate" targetfile="${build}">
+        <uptodate property="build.uptodate" targetfile="${build}">
             <srcfiles refid="src.files"/>
-            <mapper type="glob" from="*.java" to="${build}/*.class"/>
+            <mapper type="glob" from="*.java" to="../${build}/*.class"/>
         </uptodate>
     </target>
 
@@ -69,6 +71,8 @@
             <arg value="7"/>
             <arg value="-target"/>
             <arg value="7"/>
+            <arg value="-encoding"/>
+            <arg value="utf-8"/>
             <!-- To not get a warning about bootstrap classpath -->
             <arg value="-Xlint:-options"/>
             <arg line="-sourcepath ${src}"/>
@@ -119,7 +123,13 @@
 
         <!-- This relative path is wrong; running "ant -find" from a
         subdirectory fails. -->
-        <javadoc sourcepath="${src}" destdir="${api.doc}"
+        <!-- With Ant 1.9.4 or later, add
+            failonwarning="true"
+            but Travis is stuck on Ant 1.8.2 as of 6/2016 -->
+        <javadoc sourcepath="${src}"
+                 destdir="${api.doc}"
+                 private="${javadoc.private}"
+                 encoding="UTF-8"
                  additionalParam="-Xdoclint:all,-missing"
                  failonerror="true"
                  executable="${javadoc.bin}"

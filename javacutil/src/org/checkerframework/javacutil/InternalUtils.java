@@ -8,6 +8,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
@@ -132,11 +133,13 @@ public class InternalUtils {
      */
     public static boolean isAnonymousConstructor(final MethodTree method) {
         /*@Nullable*/ Element e = InternalUtils.symbol(method);
-        if (e == null || !(e instanceof Symbol))
+        if (e == null || !(e instanceof Symbol)) {
             return false;
+        }
 
-        if ((((/*@NonNull*/ Symbol)e).flags() & Flags.ANONCONSTR) != 0)
+        if ((((/*@NonNull*/ Symbol)e).flags() & Flags.ANONCONSTR) != 0) {
             return true;
+        }
 
         return false;
     }
@@ -196,8 +199,9 @@ public class InternalUtils {
 
     public final static List<AnnotationMirror> annotationsFromTypeAnnotationTrees(List<? extends AnnotationTree> annos) {
         List<AnnotationMirror> annotations = new ArrayList<AnnotationMirror>(annos.size());
-        for (AnnotationTree anno : annos)
+        for (AnnotationTree anno : annos) {
             annotations.add(((JCAnnotation)anno).attribute);
+        }
         return annotations;
     }
 
@@ -248,17 +252,21 @@ public class InternalUtils {
     }
 
     /**
-     * Returns the least upper bound of two {@link TypeMirror}s.
+     * Returns the least upper bound of two {@link TypeMirror}s,
+     * ignoring any annotations on the types.
      *
-     * @param processingEnv The {@link ProcessingEnvironment} to use.
-     * @param tm1 A {@link TypeMirror}.
-     * @param tm2 A {@link TypeMirror}.
-     * @return The least upper bound of {@code tm1} and {@code tm2}.
+     * Wrapper around Types.lub to add special handling for
+     * null types, primitives, and wildcards.
+     *
+     * @param processingEnv the {@link ProcessingEnvironment} to use.
+     * @param tm1 a {@link TypeMirror}.
+     * @param tm2 a {@link TypeMirror}.
+     * @return the least upper bound of {@code tm1} and {@code tm2}.
      */
     public static TypeMirror leastUpperBound(
             ProcessingEnvironment processingEnv, TypeMirror tm1, TypeMirror tm2) {
-        Type t1 = (Type) tm1;
-        Type t2 = (Type) tm2;
+        Type t1 = ((Type) tm1).unannotatedType();
+        Type t2 = ((Type) tm2).unannotatedType();
         JavacProcessingEnvironment javacEnv = (JavacProcessingEnvironment) processingEnv;
         Types types = Types.instance(javacEnv.getContext());
         if (types.isSameType(t1, t2)) {
@@ -306,17 +314,22 @@ public class InternalUtils {
     }
 
     /**
-     * Returns the greatest lower bound of two {@link TypeMirror}s.
+     * Returns the greatest lower bound of two {@link TypeMirror}s,
+     * ignoring any annotations on the types.
      *
-     * @param processingEnv The {@link ProcessingEnvironment} to use.
-     * @param tm1 A {@link TypeMirror}.
-     * @param tm2 A {@link TypeMirror}.
-     * @return The greatest lower bound of {@code tm1} and {@code tm2}.
+     * Wrapper around Types.glb to add special handling for
+     * null types, primitives, and wildcards.
+     *
+     *
+     * @param processingEnv the {@link ProcessingEnvironment} to use.
+     * @param tm1 a {@link TypeMirror}.
+     * @param tm2 a {@link TypeMirror}.
+     * @return the greatest lower bound of {@code tm1} and {@code tm2}.
      */
     public static TypeMirror greatestLowerBound(
             ProcessingEnvironment processingEnv, TypeMirror tm1, TypeMirror tm2) {
-        Type t1 = (Type) tm1;
-        Type t2 = (Type) tm2;
+        Type t1 = ((Type) tm1).unannotatedType();
+        Type t2 = ((Type) tm2).unannotatedType();
         JavacProcessingEnvironment javacEnv = (JavacProcessingEnvironment) processingEnv;
         Types types = Types.instance(javacEnv.getContext());
         if (types.isSameType(t1, t2)) {
@@ -349,6 +362,9 @@ public class InternalUtils {
         if (t2.getKind() == TypeKind.WILDCARD) {
             return t1;
         }
+
+        // If neither type is a primitive type, null type, or wildcard
+        // and if the types are not the same, use javac types.glb
         return types.glb(t1, t2);
     }
 
@@ -384,5 +400,9 @@ public class InternalUtils {
      */
     public static Context getJavacContext(ProcessingEnvironment env) {
         return ((JavacProcessingEnvironment)env).getContext();
+    }
+
+    public static TypeElement getTypeElement(TypeMirror type) {
+        return (TypeElement) ((Type)type).tsym;
     }
 }

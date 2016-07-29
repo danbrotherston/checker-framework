@@ -7,7 +7,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.checkerframework.framework.qual.PolymorphicQualifier;
-import org.checkerframework.framework.qual.TypeQualifier;
 
 /**
  * A polymorphic qualifier for the Interning type system.
@@ -19,8 +18,7 @@ import org.checkerframework.framework.qual.TypeQualifier;
  *
  * @checker_framework.manual #interning-checker Interning Checker
  */
-@TypeQualifier
-@PolymorphicQualifier
+@PolymorphicQualifier(UnknownInterned.class)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})

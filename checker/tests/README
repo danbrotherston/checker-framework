@@ -8,27 +8,36 @@ instead; see file ../manual/manual.html .
 How to run all the tests for the Checker Framework
 ==================================================
 
-  # Warning: this may rebuild the JDK, which takes a long time
+  # To run from the checker-framework directory:
+  # (warning: this may rebuild the JDK, which takes a long time)
+  ant -e -find build.xml tests
+
+  # To run from the checker directory
   ant -e -find build.xml all-tests
 
 Other ant targets also exist to run a subset of the tests, without
 rebuilding the JDK; for example,
+  # Run from the checker directory:
   ant -e -find build.xml nullness-tests
+  ant -e -find build.xml all-tests-nobuildjdk
 
 
 How to run just one test for the Checker Framework
 ==================================================
 
 To run an individual test (check one source code file) without rebuilding
-the JDK, do something like:
+the JDK, do something like the following, assuming that the source code
+file to be checked is AssertNonNullTest.java in directory
+$CHECKERFRAMEWORK/checker/tests/nullness/ and the checker is
+org.checkerframework.checker.nullness.NullnessChecker.
 
   cd $CHECKERFRAMEWORK/checker/tests/nullness
   (cd $CHECKERFRAMEWORK && ant -e build) && $CHECKERFRAMEWORK/checker/bin-devel/javac -processor org.checkerframework.checker.nullness.NullnessChecker -implicit:class AssertNonNullTest.java
 
-or
+or (to build distribution files but not the JDK)
 
   cd $CHECKERFRAMEWORK/checker/tests/nullness
-  (cd $CHECKERFRAMEWORK && ant -e dist-nojdk) && $CHECKERFRAMEWORK/checker/bin-devel/javac -processor org.checkerframework.checker.nullness.NullnessChecker -implicit:class AssertNonNullTest.java
+  (cd $CHECKERFRAMEWORK && ant -e dist-nobuildjdk) && $CHECKERFRAMEWORK/checker/bin-devel/javac -processor org.checkerframework.checker.nullness.NullnessChecker -implicit:class AssertNonNullTest.java
 
 or, less commonly (to rebuild the JDK):
 
@@ -38,6 +47,7 @@ or, less commonly (to rebuild the JDK):
 where the specific checker and command-line arguments are often clear from
 the directory name but can also be determined from a file such as
   checker-framework/checker/tests/src/tests/MyTypeSystemTest.java
+which is the source code for the test itself.
 
 
 Writing new tests for an existing checker
@@ -139,8 +149,9 @@ To create tests for a new checker, mimic some existing checker's tests:
    checker-framework/checker/tests/nullness-reflection, for the test cases
  * create a top-level JUnit test, such as:
    checker-framework/checker/tests/src/tests/NullnessReflectionTest.java
-   It is a subclass of ParameterizedCheckerTest, and its list of checker
-   options must include "-Anomsgtext".
+   It is a subclass of CheckerFrameworkTest, and its list of checker
+   options must include "-Anomsgtext".  (See the API documentation for
+   CheckerFrameworkTest for more detailed information.)
  * change checker-framework/checker/build.xml to run those tests
 
 Different test cases may need to pass different command-line arguments
@@ -158,9 +169,17 @@ Write @non-308-skip-test anywhere in a test file to disable that test if
 the jsr308-langtools compiler is not used. (This is useful for tests that
 depend on annotations-in-comments that would fail with the stock compiler.)
 
+Write @below-java8-jdk-skip-test anywhere in a test file to disable that
+test if the executing JDK version is lower than 8.
+This is useful when the test depends on Java 8 language features that
+need runtime support (e.g. lambdas) or depends on Java 8 APIs
+(e.g. streams and reflective type annotation access).
+Tests that only exercise the static type annotation API do not need
+this marker, as the tests will be executed with a Java 8 compiler.
+
 To disable all tests for a given type system, temporarily move away a file;
 for example,
-  mv $CHECKERFRAMEWORK/checker/tests/src/tests/OIGJTest.java $CHECKERFRAMEWORK/checker/tests/src/tests/OIGJTest.java-SAVE
+  mv $CHECKERFRAMEWORK/checker/tests/src/tests/RegexTest.java $CHECKERFRAMEWORK/checker/tests/src/tests/RegexTest.java-SAVE
 [Is there a better way?]
 
 
@@ -168,3 +187,14 @@ Annotated JDK
 =============
 
 The tests run with the annotated JDK.  Keep this in mind when writing tests.
+
+
+Seeing the javac commands that are run
+======================================
+
+To see the exact javac commands that the Checker Framework test framework
+runs, use
+  -Demit.test.debug=true
+For example:
+  ant stubfile-tests -Demit.test.debug=true
+This may be helpful during debugging.

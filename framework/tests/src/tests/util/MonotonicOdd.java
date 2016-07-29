@@ -6,12 +6,10 @@ import java.lang.annotation.Target;
 
 import org.checkerframework.framework.qual.MonotonicQualifier;
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifier;
 import org.checkerframework.framework.qual.Unqualified;
 
-@TypeQualifier
 @Inherited
 @SubtypeOf(Unqualified.class)
-@Target({ElementType.TYPE_USE})
+@Target({ ElementType.TYPE_USE, ElementType.TYPE_PARAMETER })
 @MonotonicQualifier(Odd.class)
 public @interface MonotonicOdd {}

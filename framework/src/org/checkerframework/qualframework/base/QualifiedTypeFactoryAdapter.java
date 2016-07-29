@@ -16,7 +16,10 @@ import org.checkerframework.qualframework.base.QualifiedTypeMirror.QualifiedExec
 import org.checkerframework.qualframework.base.dataflow.QualAnalysis;
 import org.checkerframework.qualframework.base.dataflow.QualTransferAdapter;
 
+import java.lang.annotation.Annotation;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -53,11 +56,17 @@ class QualifiedTypeFactoryAdapter<Q> extends BaseAnnotatedTypeFactory {
         this.postInit();
     }
 
+    // in the qualifier framework, type qualifiers are handled through the @AnnotationConverter
+    // createSupportedTypeQualifiers() must return an empty set, otherwise it will try to reflectively load qualifier framework annotations
+    // and process them in a classical manner
     @Override
-    protected QualifierDefaults createQualifierDefaults() {
-        QualifierDefaults result = super.createQualifierDefaults();
-        getCheckerAdapter().setupDefaults(result);
-        return result;
+    protected Set<Class<? extends Annotation>> createSupportedTypeQualifiers() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    protected void addCheckedCodeDefaults(QualifierDefaults defs) {
+        getCheckerAdapter().setupDefaults(defs);
     }
 
     /** Returns the underlying {@link QualifiedTypeFactory}. */
@@ -113,7 +122,7 @@ class QualifiedTypeFactoryAdapter<Q> extends BaseAnnotatedTypeFactory {
                 getCheckerAdapter().getTypeMirrorConverter(),
                 getCheckerAdapter(),
                 getQualifierHierarchyAdapter(),
-                checker.hasOption("ignoreRawTypeArguments"),
+                checker.getOption("ignoreRawTypeArguments", "true").equals("true"),
                 checker.hasOption("invariantArrays"));
 
         // TODO: Move this check (and others like it) into the adapter
@@ -342,8 +351,8 @@ class QualifiedTypeFactoryAdapter<Q> extends BaseAnnotatedTypeFactory {
     /**
      * Create the {@link TransferFunction} to be used.
      *
-     * @param analysis The {@link CFAbstractAnalysis} that the checker framework will actually use
-     * @return The {@link CFTransfer} to be used
+     * @param analysis the {@link CFAbstractAnalysis} that the checker framework will actually use
+     * @return the {@link CFTransfer} to be used
      */
     @Override
     public CFTransfer createFlowTransferFunction(CFAbstractAnalysis<CFValue, CFStore, CFTransfer> analysis) {
@@ -374,14 +383,14 @@ class QualifiedTypeFactoryAdapter<Q> extends BaseAnnotatedTypeFactory {
      * checker frameworks. The default of the checker framework also does not apply.
      */
     @Override
-    protected void annotateImplicit(Tree tree, AnnotatedTypeMirror type, boolean iUseFlow) {
-        assert root != null : "GenericAnnotatedTypeFactory.annotateImplicit: " +
+    protected void addComputedTypeAnnotations(Tree tree, AnnotatedTypeMirror type, boolean iUseFlow) {
+        assert root != null : "GenericAnnotatedTypeFactory.addComputedTypeAnnotations: " +
                 " root needs to be set when used on trees; factory: " + this.getClass();
 
         if (iUseFlow) {
             /**
              * We perform flow analysis on each {@link ClassTree} that is
-             * passed to annotateImplicitWithFlow.  This works correctly when
+             * passed to addComputedTypeAnnotations.  This works correctly when
              * a {@link ClassTree} is passed to this method before any of its
              * sub-trees.  It also helps to satisfy the requirement that a
              * {@link ClassTree} has been advanced to annotation before we
@@ -404,8 +413,9 @@ class QualifiedTypeFactoryAdapter<Q> extends BaseAnnotatedTypeFactory {
     }
 
     @Override
-    public void annotateImplicit(Element elt, AnnotatedTypeMirror type) {
+    public void addComputedTypeAnnotations(Element elt, AnnotatedTypeMirror type) {
         defaults.annotate(elt, type);
         typeAnnotator.visit(type, null);
     }
+
 }

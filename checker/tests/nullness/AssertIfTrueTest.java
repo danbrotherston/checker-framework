@@ -2,14 +2,14 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.*;
 
 /**
- * Test case for issue 62: http://code.google.com/p/checker-framework/issues/detail?id=62
+ * Test case for issue 62: https://github.com/typetools/checker-framework/issues/62
  * @skip-test
  */
 public class AssertIfTrueTest {
 
     static String killfile_filter = "";
 
-    public static void fromDir(File1 dbdir){
+    public static void fromDir(File1 dbdir) {
         if (!dbdir.isDirectory()) {
             throw new Error("Not a directory: " + dbdir);
         }
@@ -26,7 +26,6 @@ public class AssertIfTrueTest {
     // checking.
 
     public class File1 {
-        @SuppressWarnings("flowexpr.method.not.deterministic")
         @EnsuresNonNullIf(result=true, expression={"list()","list(String)","listFiles()","listFiles(String)","listFiles(Double)"})
         public boolean isDirectory() { throw new RuntimeException("skeleton method"); }
 

@@ -174,7 +174,7 @@ public class MethodRefactoringTreeTranslator<Checker extends BaseTypeChecker>
 
 	/*
 	List<JCTree> defs = tree.defs;
-	while(defs != null && defs.head != null) {
+	while (defs != null && defs.head != null) {
 	    System.out.println("Def: " + defs.head);
 	    System.out.println("Has Type: " + defs.head.getClass());
 	    defs = defs.tail;
@@ -282,7 +282,7 @@ public class MethodRefactoringTreeTranslator<Checker extends BaseTypeChecker>
 	    return maker.Return(maker.Apply(null, selectMethod, args.toList()));
 	}
     }
-       
+
 
     /**
      * Builds a method call for the given method declaration.
@@ -392,7 +392,7 @@ public class MethodRefactoringTreeTranslator<Checker extends BaseTypeChecker>
     protected boolean alreadyDefinedSafeMethod(JCTree.JCClassDecl classDef,
 					       JCTree.JCMethodDecl methodDef) {
 	List<JCTree> defs = classDef.defs;
-	while(defs != null && defs.head != null) {
+	while (defs != null && defs.head != null) {
 	    if (this.isDefSafeMethodOf(defs.head, methodDef)) {
 		return true;
 	    }
@@ -523,7 +523,7 @@ public class MethodRefactoringTreeTranslator<Checker extends BaseTypeChecker>
 	    && newSafeMethod.body == null) {
             newSafeMethod.mods.flags = newSafeMethod.mods.flags & ~(Flags.ABSTRACT);
 	    newSafeMethod.mods.flags |= Flags.DEFAULT;
-	    
+	
 	    newSafeMethod.body = maker.Block(0, List.of((JCTree.JCStatement)maker.Throw(
 		maker.NewClass(null,
 			       List.<JCTree.JCExpression>nil(),

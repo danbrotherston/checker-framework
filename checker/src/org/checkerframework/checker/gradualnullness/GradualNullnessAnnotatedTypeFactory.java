@@ -2,9 +2,8 @@ package org.checkerframework.checker.gradualnullness;
 
 import org.checkerframework.checker.nullness.NullnessAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
-import org.checkerframework.framework.qual.DefaultLocation;
 import org.checkerframework.framework.qual.Dynamic;
-import org.checkerframework.framework.qual.TypeQualifiers;
+import org.checkerframework.framework.qual.TypeUseLocation;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.util.defaults.QualifierDefaults;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy;
@@ -12,6 +11,7 @@ import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGra
 import org.checkerframework.javacutil.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,22 +22,26 @@ public class GradualNullnessAnnotatedTypeFactory extends NullnessAnnotatedTypeFa
     }
 
     @Override
-    protected boolean addUnannotatedDefaultsToQualifierDefaults(QualifierDefaults defs,
-                                                                boolean unused) {
-        unused = super.addUnannotatedDefaultsToQualifierDefaults(defs, unused);
-	defs.addUnannotatedDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
-				   DefaultLocation.RETURNS);
-	defs.addUnannotatedDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
-				   DefaultLocation.PARAMETERS);
-		/*defs.addUnannotatedDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
-			       DefaultLocation.UPPER_BOUNDS);
-	// defs.addUnannotatedDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
-	//		       DefaultLocation.EXPLICIT_UPPER_BOUNDS);*/
-	//defs.addUnannotatedDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
-	//			   DefaultLocation.FIELD);
+    protected void addUncheckedCodeDefaults(QualifierDefaults defs) {
+        //super.addUnannotatedDefaultsToQualifierDefaults(defs, unused);
+	defs.addUncheckedCodeDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
+				     TypeUseLocation.RETURN);
+	defs.addUncheckedCodeDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
+				     TypeUseLocation.PARAMETER);
+	defs.addUncheckedCodeDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
+				     TypeUseLocation.UPPER_BOUND);
+	//	defs.addUncheckedCodeDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
+	//			     TypeUseLocation.EXPLICIT_UPPER_BOUND);
+	defs.addUncheckedCodeDefault(AnnotationUtils.fromClass(elements, Dynamic.class),
+				     TypeUseLocation.FIELD);
 
-	defs.treatAccessibleFieldsAsUnannotated();
-	return unused;
+	defs.addUncheckedStandardDefaults(
+	     Arrays.asList(AnnotationUtils.fromClass(elements, Dynamic.class)),
+	     Arrays.asList(AnnotationUtils.fromClass(elements, Dynamic.class)));
+
+	//defs.treatAccessibleFieldsAsUnannotated();
+	//	return unused;
+        //super.addUncheckedCodeDefaults(defs);
     }
 
     @Override
@@ -52,13 +56,11 @@ public class GradualNullnessAnnotatedTypeFactory extends NullnessAnnotatedTypeFa
 
     @Override
     protected Set<Class<? extends Annotation>> createSupportedTypeQualifiers() {
-	Set<Class<? extends Annotation>> gradualQualifiers = 
-	    getSupportedTypeQualifiersFromAnnotation(
-                checker.getClass().getAnnotation(TypeQualifiers.class));
+	Set<Class<? extends Annotation>> gradualQualifiers =
+	    new HashSet<Class<? extends Annotation>>(Arrays.asList(Dynamic.class));
 	
 	Set<Class<? extends Annotation>> nullnessQualifiers =
-	    getSupportedTypeQualifiersFromAnnotation(
-	        checker.getClass().getSuperclass().getAnnotation(TypeQualifiers.class));
+	    super.createSupportedTypeQualifiers();
 
 	Set<Class<? extends Annotation>> typeQualifiers = new HashSet<Class<? extends Annotation>>();
 	typeQualifiers.addAll(gradualQualifiers);

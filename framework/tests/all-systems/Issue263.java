@@ -1,6 +1,5 @@
 // Test case for Issue 263:
-// https://code.google.com/p/checker-framework/issues/detail?id=263
-// @skip-test
+// https://github.com/typetools/checker-framework/issues/263
 
 abstract class Outer<T> {
 

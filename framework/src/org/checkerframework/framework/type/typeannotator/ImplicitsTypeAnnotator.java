@@ -1,7 +1,6 @@
 package org.checkerframework.framework.type.typeannotator;
 
 import org.checkerframework.framework.qual.ImplicitFor;
-import org.checkerframework.framework.qual.TypeQualifiers;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.QualifierHierarchy;
@@ -29,9 +28,9 @@ import com.sun.source.tree.Tree;
  * annotations specified by {@link ImplicitFor} for any type whose visitor is
  * not overridden or does not call {@code super}; it is designed to be invoked
  * from
- * {@link org.checkerframework.framework.type.AnnotatedTypeFactory#annotateImplicit(Element, org.checkerframework.framework.type.AnnotatedTypeMirror)}
+ * {@link org.checkerframework.framework.type.AnnotatedTypeFactory#addComputedTypeAnnotations(Element, org.checkerframework.framework.type.AnnotatedTypeMirror)}
  * and
- * {@link org.checkerframework.framework.type.AnnotatedTypeFactory#annotateImplicit(Tree, org.checkerframework.framework.type.AnnotatedTypeMirror)}.
+ * {@link org.checkerframework.framework.type.AnnotatedTypeFactory#addComputedTypeAnnotations(Tree, org.checkerframework.framework.type.AnnotatedTypeMirror)}.
  *
  * <p>
  *
@@ -54,9 +53,8 @@ public class ImplicitsTypeAnnotator extends TypeAnnotator {
     // private final AnnotatedTypeFactory atypeFactory;
 
     /**
-     * Creates a {@link ImplicitsTypeAnnotator} from the given checker, using that checker's
-     * {@link TypeQualifiers} annotation to determine the annotations that are
-     * in the type hierarchy.
+     * Creates a {@link ImplicitsTypeAnnotator} from the given checker, using
+     * that checker to determine the annotations that are in the type hierarchy.
      */
     public ImplicitsTypeAnnotator(AnnotatedTypeFactory typeFactory) {
         super(typeFactory);
@@ -79,10 +77,6 @@ public class ImplicitsTypeAnnotator extends TypeAnnotator {
             AnnotationMirror theQual = AnnotationUtils.fromClass(typeFactory.getElementUtils(), qual);
             for (TypeKind typeKind : implicit.types()) {
                 addTypeKind(typeKind, theQual);
-            }
-
-            for (Class<? extends AnnotatedTypeMirror> typeClass : implicit.typeClasses()) {
-                addTypeClass(typeClass, theQual);
             }
 
             for (Class<?> typeName : implicit.typeNames()) {

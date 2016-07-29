@@ -1,13 +1,11 @@
 package org.checkerframework.checker.units.qual;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifier;
 
 /**
  * MixedUnits is the result of multiplying or dividing units, where no more
@@ -15,9 +13,8 @@ import org.checkerframework.framework.qual.TypeQualifier;
  *
  * @checker_framework.manual #units-checker Units Checker
  */
-@TypeQualifier
 @SubtypeOf(UnknownUnits.class)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
+@Target({}) // forbids a programmer from writing it in a program
 public @interface MixedUnits {}

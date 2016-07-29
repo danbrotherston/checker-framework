@@ -148,7 +148,7 @@ public class RuntimeCheckBuilder<Checker extends BaseTypeChecker> {
      * declaration affects scope, we must treat it specially, ensuring that
      * the variable remains in scope after the check.  This involves directly
      * editing the blcok the variable declaration is contained within.
-     * 
+     *
      * We add a variable declaration in the actual statement, with no
      * no initializer, then in the check on the value, if successful, the
      * variable is set to the correct initializer value with an assignment.
@@ -258,7 +258,7 @@ public class RuntimeCheckBuilder<Checker extends BaseTypeChecker> {
      * as a parameter the given value expression tree.  The if-true branch of the
      * if statement executes the given statement, and the if-false branch of the
      * tree executes the runtimeFailureMethod with the given values.
-     * 
+     *
      * The type is provided statically at compile time to test the value against.
      * The user of this method is expected to replace the given statement with
      * the return value of this function which is itself a statement AST tree.
@@ -295,7 +295,7 @@ public class RuntimeCheckBuilder<Checker extends BaseTypeChecker> {
 
 	while (originalTypes != null && !originalTypes.isEmpty() && originalTypes.head != null) {
 	    Type newType = fixTypes(originalTypes.head, isOuter);
-	    
+	
 	    if (iterator == null) {
 		iterator = com.sun.tools.javac.util.List.of(newType);
 		newTypes = iterator;
@@ -309,7 +309,7 @@ public class RuntimeCheckBuilder<Checker extends BaseTypeChecker> {
 
 	return newTypes;
     }
-							 
+							
 
     private Type fixTypes(Type t, boolean isOuter) {
 	if (t == null) { return null; }
@@ -380,7 +380,7 @@ public class RuntimeCheckBuilder<Checker extends BaseTypeChecker> {
 	System.err.println("Building variable with type after erasure: " + realType);*/
 
 	VariableTree variable =
-	    builder.buildVariableDecl(type, 
+	    builder.buildVariableDecl(type,
 				      this.runtimeValueVarName + this.counter++,
 				      symbolOwner, value);
 	System.err.println("Built tree: " + variable);
@@ -431,7 +431,7 @@ public class RuntimeCheckBuilder<Checker extends BaseTypeChecker> {
  					  (JCExpression) builder.buildVariableUse(variable),
 					  (JCExpression) builder.buildLiteral(type.toString()));*/
 
-	JCTree failureMethodInvocation = 
+	JCTree failureMethodInvocation =
 	    this.maker.Apply(null, (JCTree.JCExpression) failureMethodAccess,
 			     com.sun.tools.javac.util.List.of((JCTree.JCExpression)
 							      builder.buildVariableUse(variable),

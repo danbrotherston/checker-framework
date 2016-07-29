@@ -4,6 +4,8 @@ import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.reflection.qual.ClassBound;
 import org.checkerframework.common.reflection.qual.ClassVal;
+import org.checkerframework.common.reflection.qual.GetConstructor;
+import org.checkerframework.common.reflection.qual.GetMethod;
 import org.checkerframework.common.reflection.qual.MethodVal;
 import org.checkerframework.common.reflection.qual.MethodValBottom;
 import org.checkerframework.common.reflection.qual.UnknownMethod;
@@ -12,7 +14,6 @@ import org.checkerframework.common.value.ValueChecker;
 import org.checkerframework.common.value.qual.ArrayLen;
 import org.checkerframework.common.value.qual.BottomVal;
 import org.checkerframework.common.value.qual.StringVal;
-import org.checkerframework.framework.qual.TypeQualifiers;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
@@ -21,8 +22,10 @@ import org.checkerframework.framework.util.AnnotationBuilder;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
 import org.checkerframework.javacutil.AnnotationUtils;
+import org.checkerframework.javacutil.InternalUtils;
 import org.checkerframework.javacutil.TreeUtils;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,29 +34,15 @@ import java.util.List;
 import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.ExecutableElement;
 
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 
-@TypeQualifiers({MethodVal.class, MethodValBottom.class, UnknownMethod.class})
 public class MethodValAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     private final AnnotationMirror METHODVAL_BOTTOM = AnnotationUtils
             .fromClass(elements, MethodValBottom.class);
     private final AnnotationMirror UNKNOWN_METHOD = AnnotationUtils.fromClass(
             elements, UnknownMethod.class);
-
-    /** Methods with form:
-    @MethodVal(classname=c, methodname=m, params=p) Method getMethod(Class<c> this, String m, Object... params)**/
-    private final ExecutableElement[] getMethod = {
-            TreeUtils.getMethod("java.lang.Class", "getMethod", 2,
-                    processingEnv),
-            TreeUtils.getMethod("java.lang.Class", "getDeclaredMethod", 2,
-                    processingEnv) };
-    /** Methods with form:
-    @MethodVal(classname=c, methodname="<init>", params=p) Method getConstructor(Class<c> this, Object... params)**/
-    private final ExecutableElement[] getConstructor = {TreeUtils.getMethod(
-            "java.lang.Class", "getConstructor", 1, processingEnv)};
 
     private static final int UNKNOWN_PARAM_LENGTH = -1;
 
@@ -63,6 +52,14 @@ public class MethodValAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             this.postInit();
         }
     }
+
+    @Override
+    protected Set<Class<? extends Annotation>> createSupportedTypeQualifiers() {
+        return Collections.unmodifiableSet(
+                new HashSet<Class<? extends Annotation>>(
+                        Arrays.asList(MethodVal.class, MethodValBottom.class, UnknownMethod.class)));
+    }
+
     @Override
     protected void initilizeReflectionResolution() {
         boolean debug = "debug".equals(checker.getOption("resolveReflection"));
@@ -203,8 +200,9 @@ public class MethodValAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             List<MethodSignature> subSignatures = getListOfMethodSignatures(sub);
             List<MethodSignature> superSignatures = getListOfMethodSignatures(sup);
             for (MethodSignature sig : subSignatures) {
-                if (!superSignatures.contains(sig))
+                if (!superSignatures.contains(sig)) {
                     return false;
+                }
             }
             return true;
         }
@@ -284,18 +282,16 @@ public class MethodValAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         }
 
         private boolean isGetConstructorMethodInovaction(MethodInvocationTree tree) {
-            for (ExecutableElement method: getConstructor ) {
-                if (TreeUtils.isMethodInvocation(tree, method, processingEnv)) {
-                    return true;
-                }
+            if (getDeclAnnotation(InternalUtils.symbol(tree),
+                    GetConstructor.class) != null) {
+                return true;
             }
-           return false;
+            return false;
         }
         private boolean isGetMethodMethodInovaction(MethodInvocationTree tree) {
-            for (ExecutableElement method: getMethod ) {
-                if (TreeUtils.isMethodInvocation(tree, method, processingEnv)) {
-                    return true;
-                }
+            if (getDeclAnnotation(InternalUtils.symbol(tree),
+                    GetMethod.class) != null) {
+                return true;
             }
            return false;
         }
@@ -396,25 +392,33 @@ class MethodSignature {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         MethodSignature other = (MethodSignature) obj;
         if (className == null) {
-            if (other.className != null)
+            if (other.className != null) {
                 return false;
-        } else if (!className.equals(other.className))
+            }
+        } else if (!className.equals(other.className)) {
             return false;
+        }
         if (methodName == null) {
-            if (other.methodName != null)
+            if (other.methodName != null) {
                 return false;
-        } else if (!methodName.equals(other.methodName))
+            }
+        } else if (!methodName.equals(other.methodName)) {
             return false;
-        if (params != other.params)
+        }
+        if (params != other.params) {
             return false;
+        }
         return true;
     }
 

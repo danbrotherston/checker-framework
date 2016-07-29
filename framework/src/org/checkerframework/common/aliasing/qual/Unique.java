@@ -7,9 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.checkerframework.framework.qual.DefaultFor;
-import org.checkerframework.framework.qual.DefaultLocation;
+import org.checkerframework.framework.qual.TypeUseLocation;
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifier;
 
 /**
  * An expression with this type has no aliases.
@@ -17,10 +16,10 @@ import org.checkerframework.framework.qual.TypeQualifier;
  * point, would evaluate to the exact same object value.
  * <p>
  *
- * A constructor's return type should be annotated with <tt>@Unique</tt> if the
+ * A constructor's return type should be annotated with {@code @Unique} if the
  * constructor does not leak references to the constructed object.
- * For example, the <tt>String()</tt> constructor return type
- * is annotated as <tt>@Unique</tt>.
+ * For example, the {@code String()} constructor return type
+ * is annotated as {@code @Unique}.
  *
  * @see MaybeAliased
  * @checker_framework.manual #aliasing-checker Aliasing Checker
@@ -28,8 +27,7 @@ import org.checkerframework.framework.qual.TypeQualifier;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE_USE)
-@TypeQualifier
+@Target({ ElementType.TYPE_USE, ElementType.TYPE_PARAMETER })
 @SubtypeOf({MaybeAliased.class})
-@DefaultFor(DefaultLocation.LOWER_BOUNDS)
+@DefaultFor(TypeUseLocation.LOWER_BOUND)
 public @interface Unique {}

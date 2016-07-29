@@ -10,6 +10,6 @@ if [ -z $TESTCLASSES ]
       TESTCLASSES=.
 fi
 
-$TESTSRC/../../bin/javac -d $TESTCLASSES -processor org.checkerframework.checker.gradualnullness.GradualNullnessChecker $TESTSRC/DynamicRuntimeVarDeclTest.java
+$TESTSRC/../../bin/javac -cp $TESTSRC/../../dist/checker.jar -d $TESTCLASSES -processor org.checkerframework.checker.gradualnullness.GradualNullnessChecker $TESTSRC/DynamicRuntimeVarDeclTest.java
 java -classpath $TESTSRC/../../dist/checker.jar:.:$TESTCLASSES DynamicRuntimeVarDeclTest > $TESTCLASSES/DynamicRuntimeVarDeclTest.testout
 diff $TESTCLASSES/DynamicRuntimeVarDeclTest.testout $TESTSRC/DynamicRuntimeVarDeclTest.out

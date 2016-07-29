@@ -50,8 +50,11 @@ Section~\ref{formatter-guarantees} provides more details.
 \end{Verbatim}
 
 
+\begin{sloppypar}
 To run the Format String Checker, supply the
 \code{-processor org.checkerframework.checker.formatter.FormatterChecker} command-line option to javac.
+\end{sloppypar}
+
 
 \section{Formatting terminology\label{formatter-terminology}}
 
@@ -264,7 +267,9 @@ relationship among all conversion categories.
 %     }
 % \end{Verbatim}
 
-\label{formatter-format-subtyping}
+
+\subsection{Subtyping rules for \<@Format>\label{formatter-format-subtyping}}
+
 Here are the subtyping rules among different
 \refqualclass{checker/formatter/qual}{Format}
 qualifiers.
@@ -272,16 +277,17 @@ It is legal to:
 
 \begin{itemize}
 \item use a format string with a weaker (less restrictive) conversion category than required.
-\item use a format string with fewer format specifiers than required, but a warning is issued.
+\item use a format string with fewer format specifiers than required.
+  Although this is legal a warning is issued because most occurrences of
+  this are due to programmer error.
 \end{itemize}
 
 The following example shows the subtyping rules in action:
 
 \begin{Verbatim}
-    @Format({FLOAT, INT})
-    String f;
+    @Format({FLOAT, INT}) String f;
 
-    f = "%f %d";       // Ok
+    f = "%f %d";       // OK
     f = "%s %d";       // OK, %s is weaker than %f
     f = "%f";          // warning: last argument is ignored
     f = "%f %d %s";    // error: too many arguments
@@ -318,7 +324,7 @@ Format String Checker guarantees the following additional properties:
 \item Every format argument's type satisfies its conversion category's restrictions.
 \end{enumerate}
 
-\item If the format arguments are passed to the format method as array,
+\item If the format arguments are passed to the format method as an array,
 a warning is issued by the Format String Checker.
         \label{formatter-array-warning}
 \end{enumerate}
@@ -435,7 +441,7 @@ Case \ref{formatter-array-warning}:
 %     String.format("%d", null);                   // ok (II 3)
 %     String.format("%1$d %1$f", 4);               // warning (II 3 a)
 %     String.format("%c",4.2);                     // warning (II 3 b)
-%     String.format("%1$d %1$f",new Object[]{1});  // warning (III 1)
+%     String.format("%1$d %1$f", new Object[]{1}); // warning (III 1)
 % \end{Verbatim}
 
 \subsection{Possible missed alarms\label{formatter-missed-alarms}}
@@ -517,7 +523,7 @@ The checker implicitly adds the \code{@Format} qualifier with the appropriate
 conversion categories to any String literal that is a valid format string.
 
 
-\section{FormatMethod}
+\section{FormatMethod\label{formatter-FormatMethod}}
 
 Your project may contain methods that forward their arguments to a format method.
 Consider for example the following \code{log} method:
@@ -557,32 +563,32 @@ The following code examples may fail at run time, and therefore they do not
 type check.  The type-checking errors are indicated by comments.
 
 \begin{Verbatim}
-    Scanner s = new Scanner(System.in);
-    String fs = s.next();
-    System.out.printf(fs, "hello", 1337);          // error: fs is not known to be a format string
+Scanner s = new Scanner(System.in);
+String fs = s.next();
+System.out.printf(fs, "hello", 1337);          // error: fs is not known to be a format string
 \end{Verbatim}
 
 \begin{Verbatim}
-    Scanner s = new Scanner(System.in);
-    @Format({GENERAL, INT}) String fs = s.next();  // error: fs is not known to have the given type
-    System.out.printf(fs, "hello", 1337);          // OK
+Scanner s = new Scanner(System.in);
+@Format({GENERAL, INT}) String fs = s.next();  // error: fs is not known to have the given type
+System.out.printf(fs, "hello", 1337);          // OK
 \end{Verbatim}
 
 \noindent The following variant does not throw a run-time error, and
 therefore passes the type-checker:
 
 \begin{Verbatim}
-    Scanner s = new Scanner(System.in);
-    String format = s.next()
-    try {
-        format = FormatUtil.asFormat(format, GENERAL, INT);
-    } catch (IllegalFormatException e) {
-        // Replace this by your own error handling.
-        System.err.println("The user entered the following invalid format string: " + format);
-        System.exit(2);
-    }
-    // fs is now known to be of type: @Format({GENERAL, INT}) String
-    System.out.printf(format,"hello",1337);
+Scanner s = new Scanner(System.in);
+String format = s.next()
+try {
+    format = FormatUtil.asFormat(format, GENERAL, INT);
+} catch (IllegalFormatException e) {
+    // Replace this by your own error handling.
+    System.err.println("The user entered the following invalid format string: " + format);
+    System.exit(2);
+}
+// fs is now known to be of type: @Format({GENERAL, INT}) String
+System.out.printf(format, "hello", 1337);
 \end{Verbatim}
 
 \noindent A potential disadvantage of using the \code{FormatUtil} class is that your code becomes
@@ -592,5 +598,5 @@ the \code{FormatUtil} class into your own code.
 
 %  LocalWords:  printf InvalidFormat Formatter FormatBottom specifier's
 %  LocalWords:  ConversionCategory isValidCodePoint BigInteger BigDecimal
-%  LocalWords:  5cm varargs TODO Formattable formatTo FormatUtil java
-%  LocalWords:  asFormat printFloatAndInt 5cm 4cm 5cm 4cm
+%  LocalWords:  varargs TODO Formattable formatTo FormatUtil java
+%  LocalWords:  asFormat printFloatAndInt

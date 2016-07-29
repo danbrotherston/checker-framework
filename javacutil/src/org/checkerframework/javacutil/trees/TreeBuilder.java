@@ -488,7 +488,7 @@ public class TreeBuilder {
     }
 
     /**
-     * 
+     *
 
     /**
      * Builds an AST Tree to access the valueOf() method of boxed type
@@ -545,7 +545,7 @@ public class TreeBuilder {
     /**
      * Gets a ClassSymbol element representing a given a class.  This class must be
      * both in the current execution classpath as well as the compilation classpath.
-     * 
+     *
      * @param clazz The class you wish to get a reference too.
      * @param procEnv The ProcessingEnvironment in which this lookup will be compiled.
      * @return Element The element representing the symbol of this class.
@@ -655,7 +655,7 @@ public class TreeBuilder {
     /**
      * Builds an AST Tree to represent an If-else statement.
      *
-     * @param cond An expression representing the If condition. 
+     * @param cond An expression representing the If condition.
      *             It should type to boolean.
      * @param ifPart A statement to execute if it "if" evaluates to true.
      * @param elsePart A statement to execute if the "if" evaluates to false.

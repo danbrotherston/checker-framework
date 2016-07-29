@@ -242,7 +242,7 @@ public class HelpfulTreeTranslator<Checker extends BaseTypeChecker> extends Tree
             remover.remove(block, exBlock);
 	    JCTree outleaf = remover.outLeaf;
 
-			      
+			
             env = attr.attribStatToTree(block, env, outleaf);
 	    //System.err.println("Both not null: " + block + " outleaf " + outleaf + " env: " + env);
 

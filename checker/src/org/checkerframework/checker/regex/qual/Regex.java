@@ -1,9 +1,7 @@
 package org.checkerframework.checker.regex.qual;
 
 import org.checkerframework.checker.regex.classic.qual.UnknownRegex;
-import org.checkerframework.checker.tainting.qual.Tainted;
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifier;
 import org.checkerframework.qualframework.poly.SimpleQualifierParameterAnnotationConverter;
 import org.checkerframework.qualframework.poly.qual.Wildcard;
 
@@ -14,16 +12,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Regex is the annotation to specify the regex qualifier.
- *
- * @see Tainted
+ * If a type is annotated as {@code @Regex(n)}, then the run-time value is
+ * a regular expression with <em>n</em> capturing groups.
+ * <p>
+ * For example, if an expression's type is <em>@Regex(2) String</em>, then
+ * at run time its value will be a legal regular expression with at least
+ * two capturing groups. The type states that possible run-time values
+ * include {@code "(a*)(b*)"}, {@code "a(b?)c(d?)e"}, and
+ * {@code "(.)(.)(.)"}, but not {@code "hello"} nor {@code "(good)bye"}
+ * nor {@code "(a*)(b*)("}.
  */
 //@ImplicitFor(trees = { Tree.Kind.NULL_LITERAL })
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
 @Repeatable(MultiRegex.class)
 // Needed for classic checker
-@TypeQualifier
 @SubtypeOf(UnknownRegex.class)
 public @interface Regex {
     /**

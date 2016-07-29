@@ -6,7 +6,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.Dynamic;
 
 public class DynamicTest {
-    
+
     void a() {
         @Dynamic String f = "abc";
         f = null;

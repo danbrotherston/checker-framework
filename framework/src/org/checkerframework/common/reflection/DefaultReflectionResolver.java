@@ -21,7 +21,9 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
 import org.checkerframework.common.basetype.BaseTypeChecker;
+import org.checkerframework.common.reflection.qual.Invoke;
 import org.checkerframework.common.reflection.qual.MethodVal;
+import org.checkerframework.common.reflection.qual.NewInstance;
 import org.checkerframework.common.reflection.qual.UnknownMethod;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
@@ -79,10 +81,6 @@ public class DefaultReflectionResolver implements ReflectionResolver {
     private final Trees trees;
     private final boolean debug;
 
-    private final ExecutableElement invoke;
-    private final ExecutableElement newInstance;
-
-
     public DefaultReflectionResolver(BaseTypeChecker checker,
             MethodValAnnotatedTypeFactory methodValProvider, boolean debug) {
         this.checker = checker;
@@ -90,17 +88,13 @@ public class DefaultReflectionResolver implements ReflectionResolver {
         this.processingEnv = checker.getProcessingEnvironment();
         this.trees = Trees.instance(processingEnv);
         this.debug = debug;
-
-        invoke = TreeUtils.getMethod("java.lang.reflect.Method", "invoke", 2,
-                processingEnv);
-        newInstance = TreeUtils.getMethod("java.lang.reflect.Constructor",
-                "newInstance", 1, processingEnv);
     }
 
     @Override
     public boolean isReflectiveMethodInvocation(MethodInvocationTree tree) {
-        if ((TreeUtils.isMethodInvocation(tree, invoke, processingEnv) || TreeUtils
-                .isMethodInvocation(tree, newInstance, processingEnv))) {
+        if ((provider.getDeclAnnotation(InternalUtils.symbol(tree),
+                Invoke.class) != null || provider.getDeclAnnotation(
+                        InternalUtils.symbol(tree), NewInstance.class) != null)) {
             return true;
         }
         // Called method is neither Method.invoke nor Constructor.newInstance
@@ -112,7 +106,8 @@ public class DefaultReflectionResolver implements ReflectionResolver {
             AnnotatedTypeFactory factory, MethodInvocationTree tree,
             Pair<AnnotatedExecutableType, List<AnnotatedTypeMirror>> origResult) {
         assert isReflectiveMethodInvocation(tree);
-        if (TreeUtils.isMethodInvocation(tree, newInstance, processingEnv)) {
+        if (provider.getDeclAnnotation(InternalUtils.symbol(tree),
+                NewInstance.class) != null) {
             return resolveConstructorCall(factory, tree, origResult);
         } else {
             return resolveMethodCall(factory, tree, origResult);
@@ -128,7 +123,7 @@ public class DefaultReflectionResolver implements ReflectionResolver {
      * @param tree
      *            The method invocation tree that has to be resolved.
      * @param origResult
-     *            The original result from <code>factory.methodFromUse</code>.
+     *            The original result from {@code factory.methodFromUse}.
      */
     private Pair<AnnotatedExecutableType, List<AnnotatedTypeMirror>> resolveMethodCall(
             AnnotatedTypeFactory factory, MethodInvocationTree tree,
@@ -178,7 +173,10 @@ public class DefaultReflectionResolver implements ReflectionResolver {
                         .getReceiverType().getAnnotations(), factory);
             }
 
-            // Glb parameter types
+            // Glb parameter types.  All formal parameter types get
+            // combined together because Method#invoke takes as argument an
+            // array of parameter types, so there is no way to distinguish
+            // the types of different formal parameters.
             for (AnnotatedTypeMirror mirror : resolvedResult.first
                     .getParameterTypes()) {
                 paramsGlb = glb(paramsGlb, mirror.getAnnotations(), factory);
@@ -259,7 +257,7 @@ public class DefaultReflectionResolver implements ReflectionResolver {
      *            The method invocation tree (representing a constructor call)
      *            that has to be resolved.
      * @param origResult
-     *            The original result from <code>factory.methodFromUse</code>.
+     *            The original result from {@code factory.methodFromUse}.
      */
     private Pair<AnnotatedExecutableType, List<AnnotatedTypeMirror>> resolveConstructorCall(
             AnnotatedTypeFactory factory, MethodInvocationTree tree,
@@ -333,7 +331,7 @@ public class DefaultReflectionResolver implements ReflectionResolver {
      * @param tree
      *            The MethodInvocationTree node that is to be resolved
      *            (Method.invoke)
-     * @return A (potentially empty) list of all resolved MethodInvocationTrees
+     * @return a (potentially empty) list of all resolved MethodInvocationTrees
      */
     private List<MethodInvocationTree> resolveReflectiveMethod(
             MethodInvocationTree tree, AnnotatedTypeFactory reflectionFactory) {
@@ -441,7 +439,7 @@ public class DefaultReflectionResolver implements ReflectionResolver {
      * @param tree
      *            The MethodInvocationTree node that is to be resolved
      *            (Constructor.newInstance)
-     * @return A (potentially empty) list of all resolved MethodInvocationTrees
+     * @return a (potentially empty) list of all resolved MethodInvocationTrees
      */
     private List<JCNewClass> resolveReflectiveConstructor(
             MethodInvocationTree tree, AnnotatedTypeFactory reflectionFactory) {
@@ -508,7 +506,7 @@ public class DefaultReflectionResolver implements ReflectionResolver {
      * Get set of MethodSymbols based on class name, method name, and parameter
      * length.
      *
-     * @return The (potentially empty) set of corresponding method Symbol(s).
+     * @return the (potentially empty) set of corresponding method Symbol(s)
      */
     private List<Symbol> getMethodSymbolsfor(String className,
             String methodName, int paramLength, Env<AttrContext> env) {
@@ -541,16 +539,19 @@ public class DefaultReflectionResolver implements ReflectionResolver {
                         }
                     }
                 }
-                if (result.size() != 0)
+                if (result.size() != 0) {
                     break;
+                }
                 Type t = classSym.getSuperclass();
-                if (!t.hasTag(CLASS) || t.isErroneous())
+                if (!t.hasTag(CLASS) || t.isErroneous()) {
                     break;
+                }
                 classSym = (ClassSymbol) t.tsym;
             }
-            if (result.size() == 0)
+            if (result.size() == 0) {
                 debugReflection("Unable to resolve method: " + className + "@"
                         + methodName);
+            }
         } catch (SecurityException | NoSuchMethodException
                 | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException e) {
@@ -565,8 +566,8 @@ public class DefaultReflectionResolver implements ReflectionResolver {
      * Get set of Symbols for constructors based on class name and parameter
      * length.
      *
-     * @return The (potentially empty) set of corresponding constructor
-     *         Symbol(s).
+     * @return the (potentially empty) set of corresponding constructor
+     *         Symbol(s)
      */
     private List<Symbol> getConstructorSymbolsfor(String className,
             int paramLength, Env<AttrContext> env) {
@@ -598,8 +599,9 @@ public class DefaultReflectionResolver implements ReflectionResolver {
                     }
                 }
             }
-            if (result.size() == 0)
+            if (result.size() == 0) {
                 debugReflection("Unable to resolve constructor!");
+            }
         } catch (SecurityException | NoSuchMethodException
                 | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException e) {
@@ -611,10 +613,10 @@ public class DefaultReflectionResolver implements ReflectionResolver {
     }
 
     /**
-     * Build lub of the two sets <code>set1</code> and <code>set2</code> using
-     * the provided AnnotatedTypeFactory.
+     * Build lub of the two types (represented by sets {@code set1}
+     * and {@code set2}) using the provided AnnotatedTypeFactory.
      * <p>
-     * If <code>set1</code> is <code>null</code> or empty, <code>set2</code> is
+     * If {@code set1} is {@code null} or empty, {@code set2} is
      * returned.
      */
     private Set<? extends AnnotationMirror> lub(
@@ -628,10 +630,10 @@ public class DefaultReflectionResolver implements ReflectionResolver {
     }
 
     /**
-     * Build glb of the two sets <code>set1</code> and <code>set2</code> using
-     * the provided AnnotatedTypeFactory.
+     * Build glb of the two types (represented by sets {@code set1}
+     * and {@code set2}) using the provided AnnotatedTypeFactory.
      * <p>
-     * If <code>set1</code> is <code>null</code> or empty, <code>set2</code> is
+     * If {@code set1} is {@code null} or empty, {@code set2} is
      * returned.
      */
     private Set<? extends AnnotationMirror> glb(

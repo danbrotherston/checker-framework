@@ -20,10 +20,10 @@ public class DynamicInheritanceRuntimeTest extends DynamicInheritanceRuntimeTest
 
     try {
       foo.fail(null);
-    } catch(RuntimeException e) {
+    } catch (RuntimeException e) {
       System.out.println("Success1");
     }
-    
+
     baz.fail(null);
   }
 

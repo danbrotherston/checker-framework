@@ -1,5 +1,5 @@
 // Test case for issue 295:
-// https://code.google.com/p/checker-framework/issues/detail?id=295
+// https://github.com/typetools/checker-framework/issues/295
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -45,4 +45,3 @@ abstract class Issue295 {
         Box<String> v = load(f);
     }
 }
-

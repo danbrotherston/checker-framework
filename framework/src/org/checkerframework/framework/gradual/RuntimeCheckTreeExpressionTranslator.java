@@ -90,7 +90,7 @@ public class RuntimeCheckTreeExpressionTranslator<Checker extends BaseTypeChecke
 	this.replacementLocations = new HashMap<JCTree, AnnotatedTypeMirror>();
 	this.argumentCheckFunctionName = methodName;
 
-	for(Map.Entry<Tree, AnnotatedTypeMirror> entry : replacementLocations.values()) {
+	for (Map.Entry<Tree, AnnotatedTypeMirror> entry : replacementLocations.values()) {
 	    this.replacementLocations.put((JCTree)(entry.getKey()), entry.getValue());
 	}
     }
@@ -118,7 +118,7 @@ public class RuntimeCheckTreeExpressionTranslator<Checker extends BaseTypeChecke
 							     maker.Literal(literalType)));
 	JCTree.JCExpression castMethodCall =
 	    maker.TypeCast(that.type, methodCall);
-							    
+							
 	//	attr.attribExpr(methodCall, this.getAttrEnv(that), that.getType());
 	this.attribute(castMethodCall,
 		       (JCTree.JCExpression)that);

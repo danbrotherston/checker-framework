@@ -23,6 +23,10 @@ public class NullnessStubfileMerge {
    @NonNull String nonNull = "Hello!";
 
    void method( ) {
+       // below fails because of stub file overruling annotated JDK
+       //:: error: (type.argument.type.incompatible)
+       java.util.List<@NonNull String> l;
+
        //:: error: (assignment.type.incompatible)
        @NonNull String error1 = nonNull.intern();
 
@@ -32,7 +36,7 @@ public class NullnessStubfileMerge {
 
        char[] nonNullChars = {'1','1'};
        char[] nullChars = null;
-       nonNull.getChars(1, 1,nonNullChars, 1);
+       nonNull.getChars(1, 1, nonNullChars, 1);
 
        //:: error: (argument.type.incompatible)
        nonNull.getChars(1, 1, nullChars, 1);

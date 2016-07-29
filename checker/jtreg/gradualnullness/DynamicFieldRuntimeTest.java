@@ -15,7 +15,7 @@ public class DynamicFieldRuntimeTest {
     DynamicFieldRuntimeTest foo = new DynamicFieldRuntimeTest();
     try {
       foo.a();
-    } catch(RuntimeException e) {
+    } catch (RuntimeException e) {
       System.out.println("Success");
     }
   }

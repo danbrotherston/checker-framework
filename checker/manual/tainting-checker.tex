@@ -14,7 +14,7 @@ For example, a user-supplied pointer, handle, or map key should be
 validated before being dereferenced.
 As another example, a user-supplied string should not be concatenated into a
 SQL query, lest the program be subject to a
-\href{http://en.wikipedia.org/wiki/Sql_injection}{SQL injection} attack.
+\href{https://en.wikipedia.org/wiki/Sql_injection}{SQL injection} attack.
 A location in your program where malicious data could do damage is
 called a \emph{sensitive sink}.
 
@@ -146,14 +146,19 @@ details.
 
 \subsection{Qualifier Parameters\label{tainting-qual-params}}
 The Tainting Checker supports qualifier parameters.
-See section \ref{qualifier-parameters} for more details on qualifier parameters.
+See Section~\ref{qualifier-parameters} for more details on qualifier parameters.
 
-The qualifier parameter system currently (as of February 2015)
+\begin{sloppypar}
+The qualifier parameter system currently
+% (as of December 2015)
 incurs a 50\% performance penalty. If this is unacceptable you can run the
-original Tainting Checker by passing \code{-processor org.checkerframework.checker.tainting.classic.TaintingClassicChecker}
+original Tainting Checker by passing the
+\code{-processor org.checkerframework.checker.tainting.classic.TaintingClassicChecker}
 command-line option to javac.
+\end{sloppypar}
 
 % TODO: one could add a String[] value to @Untainted to distinguish different
 % values, eg @Untainted{``SQL''} versus @Untainted{``HTML''}.
 
 % LocalWords:  quals untaint PolyTainted mis untainting sanitization java
+%%  LocalWords:  TaintingChecker

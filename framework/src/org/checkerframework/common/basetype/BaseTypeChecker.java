@@ -1,10 +1,8 @@
 package org.checkerframework.common.basetype;
 
-/*>>>
-import org.checkerframework.checker.igj.qual.*;
-*/
-
 import org.checkerframework.common.reflection.MethodValChecker;
+import org.checkerframework.dataflow.cfg.CFGVisualizer;
+
 import org.checkerframework.framework.gradual.FillInTypePlaceholderTreeTranslator;
 import org.checkerframework.framework.gradual.ConstructorInvocationRefactoringTranslator;
 import org.checkerframework.framework.gradual.ConstructorRefactoringTranslator;
@@ -12,8 +10,8 @@ import org.checkerframework.framework.gradual.MethodRefactoringTreeTranslator;
 import org.checkerframework.framework.gradual.MethodRenamingTreeTranslator;
 import org.checkerframework.framework.gradual.RuntimeCheckBuilder;
 import org.checkerframework.framework.gradual.RuntimeCheckTreeExpressionTranslator;
+
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifiers;
 import org.checkerframework.framework.source.SourceChecker;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
@@ -95,9 +93,8 @@ import com.sun.tools.javac.util.Log;
  *
  * <p>
  *
- * Subclasses must specify the set of type qualifiers they support either by
- * annotating the subclass with {@link TypeQualifiers} or by overriding the
- * {@link AnnotatedTypeFactory#createSupportedTypeQualifiers()} method.
+ * Subclasses must specify the set of type qualifiers they support. See
+ * {@link AnnotatedTypeFactory#createSupportedTypeQualifiers()}.
  *
  * <p>
  *
@@ -219,8 +216,9 @@ public abstract class BaseTypeChecker extends SourceChecker implements BaseTypeC
             BaseTypeVisitor<?> result = invokeConstructorFor(classToLoad,
                     new Class<?>[]{BaseTypeChecker.class},
                     new Object[]{this});
-            if (result != null)
+            if (result != null) {
                 return result;
+            }
             checkerClass = checkerClass.getSuperclass();
         }
 
@@ -396,8 +394,8 @@ public abstract class BaseTypeChecker extends SourceChecker implements BaseTypeC
      * only such checker, or null if none was found.
      * The caller must know the exact checker class to request.
      *
-     * @param checkerClass The class of the subchecker.
-     * @return The requested subchecker or null if not found.
+     * @param checkerClass the class of the subchecker
+     * @return the requested subchecker or null if not found
      */
     @SuppressWarnings("unchecked")
     public <T extends BaseTypeChecker> T getSubchecker(Class<T> checkerClass) {
@@ -416,8 +414,8 @@ public abstract class BaseTypeChecker extends SourceChecker implements BaseTypeC
      * type factory is null.
      * The caller must know the exact checker class to request.
      *
-     * @param checkerClass The class of the subchecker.
-     * @return The type factory of the requested subchecker or null if not found.
+     * @param checkerClass the class of the subchecker
+     * @return the type factory of the requested subchecker or null if not found
      */
     @SuppressWarnings("unchecked")
     public <T extends GenericAnnotatedTypeFactory<?, ?, ?, ?>, U extends BaseTypeChecker> T getTypeFactoryOfSubchecker(Class<U> checkerClass) {
@@ -453,7 +451,8 @@ public abstract class BaseTypeChecker extends SourceChecker implements BaseTypeC
             try {
                 BaseTypeChecker instance = subcheckerClass.newInstance();
                 instance.setProcessingEnvironment(this.processingEnv);
-                instance.subcheckers = Collections.unmodifiableList(new ArrayList<BaseTypeChecker>()); // Prevent the new checker from storing non-immediate subcheckers
+                // Prevent the new checker from storing non-immediate subcheckers
+                instance.subcheckers = Collections.unmodifiableList(new ArrayList<BaseTypeChecker>());
                 immediateSubcheckers.add(instance);
                 instance.immediateSubcheckers = instance.instantiateSubcheckers(alreadyInitializedSubcheckerMap);
                 instance.setParentChecker(this);
@@ -485,7 +484,7 @@ public abstract class BaseTypeChecker extends SourceChecker implements BaseTypeC
 
         return subcheckers;
     }
-    
+
     public void gradualAfterTypeProcess(TypeElement element, TreePath path) {
 	// First perform normal typechecking.
 	//System.err.println("Starting processing Element: " + element);
@@ -582,7 +581,7 @@ public abstract class BaseTypeChecker extends SourceChecker implements BaseTypeC
 
 	    // Now attribute the new trees.
 	    //Map<JCTree, JCTree> unattributedTrees = replacer.getUnattributedTrees();
-	    
+	
 	    //AttributingTreeTranslator translator =
 	    //new AttributingTreeTranslator(this, getProcessingEnvironment(), path,
 	    //				      unattributedTrees);
@@ -643,7 +642,7 @@ public abstract class BaseTypeChecker extends SourceChecker implements BaseTypeC
         // by a previous checker run in an aggregate checker.
         int nerrorsOfAllPreviousCheckers = this.errsOnLastExit;
         for (BaseTypeChecker checker : getSubcheckers()) {
-            checker.errsOnLastExit += nerrorsOfAllPreviousCheckers;
+            checker.errsOnLastExit = nerrorsOfAllPreviousCheckers;
             int errorsBeforeTypeChecking = log.nerrors;
 
             checker.typeProcess(element, tree);
@@ -651,7 +650,7 @@ public abstract class BaseTypeChecker extends SourceChecker implements BaseTypeC
             int errorsAfterTypeChecking = log.nerrors;
             nerrorsOfAllPreviousCheckers += errorsAfterTypeChecking - errorsBeforeTypeChecking;
         }
-        this.errsOnLastExit += nerrorsOfAllPreviousCheckers;
+        this.errsOnLastExit = nerrorsOfAllPreviousCheckers;
         super.typeProcess(element, tree);
 
 	if (this.isGradualTypeSystem()) {
@@ -705,6 +704,35 @@ public abstract class BaseTypeChecker extends SourceChecker implements BaseTypeC
             return getTypeFactory().getAnnotationFormatter().formatAnnotationMirror((AnnotationMirror)arg);
         } else {
             return super.processArg(arg);
+        }
+    }
+
+    protected boolean shouldAddShutdownHook() {
+        if (super.shouldAddShutdownHook() ||
+                getTypeFactory().getCFGVisualizer() != null) {
+            return true;
+        }
+        for (BaseTypeChecker checker : getSubcheckers()) {
+            if (checker.getTypeFactory().getCFGVisualizer() != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected void shutdownHook() {
+        super.shutdownHook();
+
+        CFGVisualizer<?, ?, ?> viz = getTypeFactory().getCFGVisualizer();
+        if (viz != null) {
+            viz.shutdown();
+        }
+
+        for (BaseTypeChecker checker : getSubcheckers()) {
+            viz = checker.getTypeFactory().getCFGVisualizer();
+            if (viz != null) {
+                viz.shutdown();
+            }
         }
     }
 }

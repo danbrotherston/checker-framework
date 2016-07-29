@@ -16,8 +16,6 @@ import org.checkerframework.framework.flow.CFAbstractAnalysis;
 import org.checkerframework.framework.flow.CFStore;
 import org.checkerframework.framework.flow.CFTransfer;
 import org.checkerframework.framework.flow.CFValue;
-import org.checkerframework.framework.qual.DefaultLocation;
-import org.checkerframework.framework.qual.TypeQualifiers;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedArrayType;
@@ -32,13 +30,13 @@ import org.checkerframework.framework.type.typeannotator.TypeAnnotator;
 import org.checkerframework.framework.util.AnnotationBuilder;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
-import org.checkerframework.framework.util.defaults.QualifierDefaults;
 import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.ElementUtils;
 import org.checkerframework.javacutil.InternalUtils;
 import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.TypesUtils;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -70,11 +68,9 @@ import com.sun.source.tree.UnaryTree;
  *         AnnotatedTypeFactory for the Value type system.
  *
  */
-@TypeQualifiers({ ArrayLen.class, BoolVal.class, DoubleVal.class, IntVal.class,
-        StringVal.class, BottomVal.class, UnknownVal.class })
 public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
-    protected final AnnotationMirror  UNKNOWNVAL,BOTTOMVAL;
+    protected final AnnotationMirror UNKNOWNVAL, BOTTOMVAL;
     /** The maximum number of values allowed in an annotation's array */
     protected static final int MAX_VALUES = 10;
     protected Set<String> coveredClassStrings;
@@ -114,6 +110,12 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         if (this.getClass().equals(ValueAnnotatedTypeFactory.class)) {
             this.postInit();
         }
+    }
+
+    @Override
+    protected Set<Class<? extends Annotation>> createSupportedTypeQualifiers() {
+        return getBundledTypeQualifiersWithPolyAll(
+                BottomVal.class);
     }
 
     public void disableWarnings() {
@@ -158,8 +160,7 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 
     private AnnotatedTypeMirror postFixInt(AnnotatedTypeMirror anno,
             boolean increment) {
-        List<Long> values = getIntValues(
-                anno.getAnnotation(IntVal.class));
+        List<Long> values = getIntValues(anno.getAnnotation(IntVal.class));
         List<? extends Number> castedValues = NumberUtils.castNumbers(
                 anno.getUnderlyingType(), values);
         List<Long> results = new ArrayList<>();
@@ -219,14 +220,6 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     @Override
     public QualifierHierarchy createQualifierHierarchy(MultiGraphFactory factory) {
         return new ValueQualifierHierarchy(factory);
-    }
-    @Override
-    protected QualifierDefaults createQualifierDefaults() {
-        QualifierDefaults defaults = super.createQualifierDefaults();
-        defaults.addAbsoluteDefault(UNKNOWNVAL, DefaultLocation.OTHERWISE);
-        defaults.addAbsoluteDefault(BOTTOMVAL, DefaultLocation.LOWER_BOUNDS);
-
-        return defaults;
     }
 
     @Override
@@ -346,10 +339,10 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 // If either is UNKNOWNVAL, ARRAYLEN, STRINGVAL, or BOOLEAN then
                 // the LUB is
                 // UnknownVal
-                if (!(AnnotationUtils.areSameByClass(a1, IntVal.class)
-                        || AnnotationUtils.areSameByClass(a1, DoubleVal.class)
-                        || AnnotationUtils.areSameByClass(a2, IntVal.class)
-                        || AnnotationUtils.areSameByClass(a2, DoubleVal.class))) {
+                if (!((AnnotationUtils.areSameByClass(a1, IntVal.class)
+                       || AnnotationUtils.areSameByClass(a1, DoubleVal.class))
+                      && (AnnotationUtils.areSameByClass(a2, IntVal.class)
+                            || AnnotationUtils.areSameByClass(a2, DoubleVal.class)))) {
                     return UNKNOWNVAL;
                 } else {
                     // At this point one of them must be a DoubleVal and one an
@@ -512,7 +505,7 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             }
         }
 
-        private void handleInitalizers(List<? extends ExpressionTree> initializers,AnnotatedArrayType type) {
+        private void handleInitalizers(List<? extends ExpressionTree> initializers, AnnotatedArrayType type) {
 
             List<Integer> array = new ArrayList<>();
             array.add(initializers.size());
@@ -572,8 +565,9 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 }
                 i++;
             }
-            if (allLiterals)
+            if (allLiterals) {
                 return new String(bytes);
+            }
             // If any part of the initialize isn't know,
             // the stringval isn't known.
             return null;
@@ -595,8 +589,9 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                     allLiterals = false;
                 }
             }
-            if (allLiterals)
+            if (allLiterals) {
                 return stringVal;
+            }
             // If any part of the initialize isn't know,
             // the stringval isn't known.
             return null;
@@ -682,8 +677,7 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         /**
          * Simple method to take a MemberSelectTree representing a method call
          * and determine if the method's return is annotated with
-         * @StaticallyExecutable.
-         *
+         * {@code @StaticallyExecutable}.
          */
         private boolean methodIsStaticallyExecutable(Element method) {
             return getDeclAnnotation(method, StaticallyExecutable.class) != null;
@@ -719,7 +713,7 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 List<?> receiverValues;
 
                 if (receiver != null && !ElementUtils.isStatic(TreeUtils.elementFromUse(tree))) {
-                    receiverValues = getValues(receiver,receiver.getUnderlyingType());
+                    receiverValues = getValues(receiver, receiver.getUnderlyingType());
                     if (receiverValues.isEmpty()) {
                         // values aren't known, so don't try to evaluate the
                         // method
@@ -801,8 +795,9 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                         String fieldName = tree.getIdentifier().toString();
                         value = evalutator.evaluateStaticFieldAccess(classname,
                                 fieldName, tree);
-                        if (value != null)
+                        if (value != null) {
                             type.replaceAnnotation(resultAnnotationHandler(type.getUnderlyingType(), Collections.singletonList(value), tree));
+                        }
                         return null;
                     }
                 }
@@ -851,7 +846,7 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             Class<?> resultClass = ValueCheckerUtils.getClassFromType(resultType);
 
             // For some reason null is included in the list of values,
-            // so remove it so that it does not cause a NPE else where.
+            // so remove it so that it does not cause a NPE elsewhere.
             results.remove(null);
             if (results.size() == 0) {
                 return UNKNOWNVAL;

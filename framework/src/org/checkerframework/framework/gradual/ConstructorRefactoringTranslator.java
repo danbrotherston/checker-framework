@@ -216,7 +216,7 @@ public class ConstructorRefactoringTranslator<Checker extends BaseTypeChecker>
 	} catch (ClassNotFoundException e) {
 	    System.err.println("linking error, cannot get the annotation nullable class name during compilation.");
 	}
-	Type nullableAnnotationType = 
+	Type nullableAnnotationType =
 	    ((Symbol) (this.builder.getClassSymbolElement(nullableAnnotationClass,
 							  this.procEnv))).type;
 

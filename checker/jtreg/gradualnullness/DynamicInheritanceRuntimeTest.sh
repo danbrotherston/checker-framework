@@ -16,7 +16,7 @@ $TESTSRC/../../bin/javac -d $TESTCLASSES $TESTSRC/DynamicInheritanceRuntimeTestP
 
 rm $TESTCLASSES/DynamicInheritanceRuntimeTest.class
 
-$TESTSRC/../../bin/javac -doe -classpath $TESTCLASSES -d $TESTCLASSES -processor org.checkerframework.checker.gradualnullness.GradualNullnessChecker $TESTSRC/DynamicInheritanceRuntimeTest.java
+$TESTSRC/../../bin/javac -classpath $TESTCLASSES -d $TESTCLASSES -processor org.checkerframework.checker.gradualnullness.GradualNullnessChecker $TESTSRC/DynamicInheritanceRuntimeTest.java
 
 java -classpath $TESTSRC/../../dist/checker.jar:.:$TESTCLASSES DynamicInheritanceRuntimeTest > $TESTCLASSES/DynamicInheritanceRuntimeTest.testout
 

@@ -12,9 +12,9 @@ fi
 
 set -e
 
-$TESTSRC/../../bin/javac -d $TESTCLASSES $TESTSRC/DynamicFieldRuntimeTestUnchecked.java
+$TESTSRC/../../bin/javac -cp $TESTSRC/../../dist/checker.jar -d $TESTCLASSES $TESTSRC/DynamicFieldRuntimeTestUnchecked.java
 
-$TESTSRC/../../bin/javac -classpath $TESTCLASSES -d $TESTCLASSES -processor org.checkerframework.checker.gradualnullness.GradualNullnessChecker $TESTSRC/DynamicFieldRuntimeTest.java
+$TESTSRC/../../bin/javac -classpath $TESTCLASSES:$TESTSRC/../../dist/checker.jar -d $TESTCLASSES -processor org.checkerframework.checker.gradualnullness.GradualNullnessChecker $TESTSRC/DynamicFieldRuntimeTest.java
 
 java -classpath $TESTSRC/../../dist/checker.jar:.:$TESTCLASSES DynamicFieldRuntimeTest > $TESTCLASSES/DynamicFieldRuntimeTest.testout
 

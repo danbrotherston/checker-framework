@@ -80,7 +80,6 @@ public class ExecUtil {
                             exception = exc;
                         } finally {
                             quietlyClose(in);
-                            quietlyClose(out);
                         }
                     }
                 }
@@ -97,14 +96,14 @@ public class ExecUtil {
     public static void quietlyClose(final Writer writer) {
         try {
             writer.close();
-        } catch(IOException ioExc) {
+        } catch (IOException ioExc) {
         }
     }
 
     public static void quietlyClose(final Reader reader) {
         try {
             reader.close();
-        } catch(IOException ioExc) {
+        } catch (IOException ioExc) {
         }
     }
 }

@@ -49,7 +49,7 @@ import javax.lang.model.util.Types;
  * }</pre>
  * would have an empty map as a result:
  * <pre>{@code
- *      Map() //there are no type argument relationships between the two types
+ *      Map() // there are no type argument relationships between the two types
  * }</pre>
  */
 public class TypeArgumentMapper {
@@ -90,7 +90,7 @@ public class TypeArgumentMapper {
     }
 
     /**
-     * @return A Map(type parameter symbol -> index in type parameter list)
+     * @return a Map(type parameter symbol &rarr; index in type parameter list)
      */
     private static Map<TypeParameterElement, Integer> getElementToIndex(TypeElement typeElement) {
         Map<TypeParameterElement, Integer> result = new LinkedHashMap<>();
@@ -132,11 +132,11 @@ public class TypeArgumentMapper {
             final Set<TypeParameterElement> currentTypeParams = new HashSet<>();
 
 
-            //takes a type records of the form:
+            // takes a type records of the form:
             //  TypeRecord(element = MyMap<Y1,Y2>, type = null)
             //  TypeRecord(element = AbstractMap<A1,A2>, type = AbstractMap<Y1,Y2>)
             //  TypeRecord(element = Map<M1,M2>, type = AbstractMap<A1,A2>)
-            //And makes a map:
+            // And makes a map:
             //   Map(Y1 -> [A1], Y2 -> [A2], A1 -> [M1], A2 -> M2]
             Iterator<TypeRecord> path = pathToSupertype.iterator();
             TypeRecord current = path.next();
@@ -162,8 +162,8 @@ public class TypeArgumentMapper {
 
             List<? extends TypeParameterElement> supertypeParams = supertype.getTypeParameters();
 
-            //You can think of the map above as a set of links from SubtypeParameter -> Supertype Parameter
-            //e.g. in Map(Y1 -
+            // You can think of the map above as a set of links from SubtypeParameter -> Supertype Parameter
+            // e.g. in Map(Y1 -
             for (TypeParameterElement subtypeParam : subtype.getTypeParameters()) {
                 Set<TypeParameterElement> subtypePath = flattenPath(intermediate.get(subtypeParam), intermediate);
                 subtypePath.retainAll(supertypeParams);
@@ -210,27 +210,33 @@ public class TypeArgumentMapper {
     /**
      * Create a list of TypeRecord's that form a "path" to target from subtype.
      * e.g. Suppose I have the types
+     * <pre>{@code
      * interface Map<M1,M2>
      * class AbstractMap<A1,A2> implements Map<A1,A2>, Iterable<Entry<M1,M2>>
      * class MyMap<Y1,Y2> extends AbstractMap<Y1,Y2> implements List<Entry<Y1,Y2>>
+     * }</pre>
      *
      * The path from MyMap to Map would be:
      *
+     * <pre>{@code
      * TypeRecord(element = MyMap<Y1,Y2>, type = null)
      * TypeRecord(element = AbstractMap<A1,A2>, type = AbstractMap<Y1,Y2>)
      * TypeRecord(element = Map<M1,M2>, type = AbstractMap<A1,A2>)
+     * }</pre>
      *
      * Note: You can have an implementation of the same interface inherited multiple times as long
      * as the parameterization of that interface remains the same
      * e.g.
+     * <pre>{@code
      * interface List<E>
      * class AbstractList<A> implements List<E>
      * class ArrayList<T> extends AbstractList<T> implements List<T>
+     * }</pre>
      * Notice how ArrayList implements list both by inheriting from AbstractList and from explicitly
      * listing it in the implements clause.  We prioritize finding a path through the list of interfaces first
      * since this will be the shorter path.
      *
-     * @return A set of type records that represents the sequence of directSupertypes between
+     * @return a set of type records that represents the sequence of directSupertypes between
      * subtype and target
      */
     private static List<TypeRecord> depthFirstSearchForSupertype(final TypeElement subtype,
@@ -290,11 +296,15 @@ public class TypeArgumentMapper {
      *  Maps a class or interface's declaration element to the type it would be if viewed from a subtype class or interface
      *
      * e.g. suppose we have the elements for the declarations:
+     * <pre>{@code
      * class A<Ta>
      * class B<Tb> extends A<Tb>
+     * }</pre>
      *
      * The type record of B if it is viewed as class A would bed:
+     * <pre>{@code
      *    TypeRecord( element = A<Ta>, type = A<Tb> )
+     * }</pre>
      *
      * That is, B can be viewed as an object of type A with an type argument of type parameter Tb
      */

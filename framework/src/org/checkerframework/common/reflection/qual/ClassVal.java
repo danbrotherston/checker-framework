@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifier;
 
 /**
  * This represents a {@link java.lang.Class Class&lt;T&gt;} object
@@ -16,13 +15,11 @@ import org.checkerframework.framework.qual.TypeQualifier;
  *
  * @checker_framework.manual #methodval-and-classval-checkers ClassVal Checker
  */
-@TypeQualifier
 @SubtypeOf({ UnknownClass.class })
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE_USE })
+@Target({ ElementType.TYPE_USE, ElementType.TYPE_PARAMETER })
 public @interface ClassVal {
     /** The <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-13.html#jls-13.1">binary name</a>
      * of the class that this Class object represents. */
     String[] value();
 }
-

@@ -1,5 +1,11 @@
 package org.checkerframework.framework.qual;
 
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
@@ -8,18 +14,12 @@ import static java.lang.annotation.ElementType.PACKAGE;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
  * Applied to a declaration of a package, type, method, variable, etc.,
  * specifies that the given annotation should be the default.  The default is
  * applied to type uses within the declaration for which no other
  * annotation is explicitly written.
- * (The default is not applied to the "non-defaultable locations":  class
+ * (The default is not applied to the "parametric locations":  class
  * declarations, type parameter declarations, and type parameter uses.)
  * If multiple DefaultQualifier annotations are in scope, the innermost one
  * takes precedence.
@@ -30,7 +30,7 @@ import java.lang.annotation.Target;
  * unrelated type systems, or with different {@code locations} fields) at
  * the same location, use {@link DefaultQualifiers}.
  *
- * @see DefaultLocation
+ * @see TypeUseLocation
  * @see DefaultQualifiers
  * @see DefaultQualifierInHierarchy
  * @see DefaultFor
@@ -52,5 +52,5 @@ public @interface DefaultQualifier {
     Class<? extends Annotation> value();
 
     /** @return the locations to which the annotation should be applied */
-    DefaultLocation[] locations() default {DefaultLocation.ALL};
+    TypeUseLocation[] locations() default { TypeUseLocation.ALL };
 }

@@ -106,7 +106,7 @@ public class MethodRenamingTreeTranslator<Checker extends BaseTypeChecker>
      */
     protected final AnnotatedTypeFactory aTypeFactory;
 
-    private Element lastSymbolOwner = null;    
+    private Element lastSymbolOwner = null;
 
     /**
      * Visit method application to change the names of checked applications
@@ -281,7 +281,7 @@ public class MethodRenamingTreeTranslator<Checker extends BaseTypeChecker>
 		    maker.Select(receiver, (Symbol) elem);
 
                 if (receiver.toString().equals("this")) {
-                    newMethodSelect = maker.Ident(names.fromString(elem.getSimpleName().toString())); 
+                    newMethodSelect = maker.Ident(names.fromString(elem.getSimpleName().toString()));
                 }
 
 		// Arguments are the same, just use the original.

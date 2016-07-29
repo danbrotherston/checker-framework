@@ -149,7 +149,7 @@ public class ConstructorInvocationRefactoringTranslator<Checker extends BaseType
 	//	System.out.println("Tree symbol: " + tree.constructor);
 	//	System.out.println("Tree Type: " + tree.constructorType);
 	//	System.out.println("Tree Type Symbol: " + tree.constructorType.tsym);
-        
+
         if (tree.constructor.owner.asType() instanceof DeclaredType) {
             Element constructedClass = ((DeclaredType) tree.constructor.owner.asType()).asElement();
             if (constructedClass != null) {
@@ -292,7 +292,7 @@ public class ConstructorInvocationRefactoringTranslator<Checker extends BaseType
 	methodLoop:
 	for (Element elem : this.procEnv.getElementUtils().getAllMembers(receiverTypeElement)) {
 	    //	    System.out.println("Simple Name: '" + elem.getSimpleName()
-	    //		       + "' constructor name: '" + this.constructorMethodName); 
+	    //		       + "' constructor name: '" + this.constructorMethodName);
 	    if (elem.getSimpleName().toString().equals(this.constructorMethodName)) {
 		// System.out.println("Testing Elem: " + elem);
 		AnnotatedExecutableType newExecutable =

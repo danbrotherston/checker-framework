@@ -79,9 +79,11 @@ cases above, but for now you need to use \<@Interned>, \<@UsesObjectEquals>
 (which handles a surprising number of cases), and/or
 \<@SuppressWarnings>.
 
+\begin{sloppypar}
 To run the Interning Checker, supply the
 \code{-processor org.checkerframework.checker.interning.InterningChecker}
 command-line option to javac.  For examples, see Section~\ref{interning-example}.
+\end{sloppypar}
 
 
 \section{Interning annotations\label{interning-annotations}}
@@ -95,9 +97,8 @@ These qualifiers are part of the Interning type system:
   values).
 
 \item[\refqualclass{checker/interning/qual}{PolyInterned}]
-  indicates qualifier polymorphism.  For a description of
-  \refqualclass{checker/interning/qual}{PolyInterned}, see
-  Section~\ref{qualifier-polymorphism}.
+  indicates qualifier polymorphism (see
+  Section~\ref{qualifier-polymorphism}).
 
 \item[\refqualclass{checker/interning/qual}{UsesObjectEquals}]
   is a class (not type) annotation that indicates that this class's
@@ -122,10 +123,16 @@ In order to perform checking, you must annotate your code with the \refqualclass
 type annotation, which indicates a type for the canonical representation of an
 object:
 
+%BEGIN LATEX
+\begin{smaller}
+%END LATEX
 \begin{Verbatim}
             String s1 = ...;  // type is (uninterned) "String"
   @Interned String s2 = ...;  // Java type is "String", but checker treats it as "@Interned String"
 \end{Verbatim}
+%BEGIN LATEX
+\end{smaller}
+%END LATEX
 
 The type system enforced by the checker plugin ensures that only interned
 values can be assigned to \code{s2}.
@@ -236,9 +243,11 @@ To try the Interning Checker on a source file that uses the \refqualclass{checke
 use the following command (where \code{javac} is the Checker Framework compiler that
 is distributed with the Checker Framework):
 
+\begin{mysmall}
 \begin{Verbatim}
   javac -processor org.checkerframework.checker.interning.InterningChecker examples/InterningExample.java
 \end{Verbatim}
+\end{mysmall}
 
 \noindent
 Compilation will complete without errors or warnings.
@@ -246,9 +255,11 @@ Compilation will complete without errors or warnings.
 To see the checker warn about incorrect usage of annotations, use the following
 command:
 
+\begin{mysmall}
 \begin{Verbatim}
   javac -processor org.checkerframework.checker.interning.InterningChecker examples/InterningExampleWithWarnings.java
 \end{Verbatim}
+\end{mysmall}
 
 \noindent
 The compiler will issue an error regarding violation of the semantics of
@@ -269,9 +280,9 @@ The Checker Framework's interning annotations are similar to annotations used
 elsewhere.
 
 If your code is already annotated with a different interning
-annotation, you can reuse that effort.  The Checker Framework comes with
-cleanroom re-implementations of annotations from other tools.  It treats
-them exactly as if you had written the corresponding annotation from the
+annotation, the Checker Framework can type-check your code.
+It treats annotations from other tools
+exactly as if you had written the corresponding annotation from the
 Interning Checker, as described in Figure~\ref{fig-interning-refactoring}.
 
 
@@ -298,17 +309,9 @@ $\Rightarrow$
 \label{fig-interning-refactoring}
 \end{figure}
 
-Alternately, the Checker Framework can process those other annotations (as
-well as its own, if they also appear in your program).  The Checker
-Framework has its own definition of the annotations on the left side of
-Figure~\ref{fig-interning-refactoring}, so that they can be used as type
-qualifiers.  The Checker Framework interprets them according to the right
-side of Figure~\ref{fig-interning-refactoring}.
-
 
 
 % LocalWords:  plugin MyInternedClass enum InterningExampleWithWarnings java
 % LocalWords:  PolyInterned Alint dotequals quals InterningAnnotatedTypeFactory
-% LocalWords:  javac InterningVisitor JLS Acheckclass UsesObjectEquals 5cm
+% LocalWords:  javac InterningVisitor JLS Acheckclass UsesObjectEquals
 %  LocalWords:  consing valueOf superclasses s2 cleanroom canonicalization
-%  LocalWords:  5cm

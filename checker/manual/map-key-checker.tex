@@ -71,7 +71,7 @@ slightly refactor your code.  For example, this would be illegal:
 \begin{verbatim}
 Map<String,Object> m;
 Collection<@KeyFor("m") String> coll;
-coll.add(x);   // error:  coll's element type is @KeyFor("m") String, but x does not have that type
+coll.add(x);   // error: element type is @KeyFor("m") String, but x does not have that type
 m.put(x, ...);
 \end{verbatim}
 
@@ -131,8 +131,7 @@ if (m.containsKey(k)) {
     // At this point, the type of k is refined to @KeyFor("m") String.
     km = k;   // OK
     ...
-}
-else {
+} else {
     km = k;   // Error since k is not known to be a key for map m.
     ...
 }
@@ -150,7 +149,7 @@ class MyClass {
     private @KeyFor("m") String km;
 
     public void myMethod() {
-        if (m.containsKey(k)){
+        if (m.containsKey(k)) {
             km = k;   // OK: the type of k is refined to @KeyFor("m") String
 
             sideEffectFreeMethod();
@@ -173,4 +172,4 @@ class MyClass {
 
 
 %%  LocalWords:  KeyFor containsKey java keyfor UnknownKeyFor KeyForBottom
-%%  LocalWords:  2cm mapSet keySet km threeLetterWordSubset JT
+%%  LocalWords:  mapSet keySet km threeLetterWordSubset JT

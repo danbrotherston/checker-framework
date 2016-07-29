@@ -7,7 +7,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifier;
 
 /**
  * This annotation is used on a formal parameter to indicate that the
@@ -17,7 +16,7 @@ import org.checkerframework.framework.qual.TypeQualifier;
  * <p>
  *
  * For example, the receiver parameter of {@link StringBuffer#append(String
- * s)} is annotated as <tt>@LeakedToResult</tt>, because the method returns
+ * s)} is annotated as {@code @LeakedToResult}, because the method returns
  * the updated receiver.
  *
  * @see NonLeaked
@@ -35,6 +34,5 @@ import org.checkerframework.framework.qual.TypeQualifier;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE_USE })
-@TypeQualifier
 @SubtypeOf({NonLeaked.class})
 public @interface LeakedToResult {}

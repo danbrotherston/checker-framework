@@ -1,28 +1,26 @@
 package org.checkerframework.common.reflection.qual;
 
-import java.lang.annotation.Target;
-
 import org.checkerframework.framework.qual.ImplicitFor;
 import org.checkerframework.framework.qual.InvisibleQualifier;
+import org.checkerframework.framework.qual.LiteralKind;
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifier;
+import org.checkerframework.framework.qual.TargetLocations;
+import org.checkerframework.framework.qual.TypeUseLocation;
 
-import com.sun.source.tree.Tree;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 
 /**
  * Represents the bottom of the ClassVal qualifier hierarchy. This is used to
- * make the <tt>null</tt> literal a subtype of all ClassVal annotations.
- * <p>
- *
- * This annotation may not be written in source code; it is an implementation
- * detail of the checker.
+ * make the {@code null} literal a subtype of all ClassVal annotations.
  *
  * @checker_framework.manual #methodval-and-classval-checkers ClassVal Checker
  */
-@TypeQualifier
 @InvisibleQualifier
-@ImplicitFor(trees = { Tree.Kind.NULL_LITERAL }, typeNames = { java.lang.Void.class })
+@ImplicitFor(literals = { LiteralKind.NULL }, typeNames = { java.lang.Void.class })
 @SubtypeOf({ ClassVal.class, ClassBound.class })
-@Target({})
+@Target({ ElementType.TYPE_USE, ElementType.TYPE_PARAMETER })
+@TargetLocations({ TypeUseLocation.EXPLICIT_LOWER_BOUND,
+    TypeUseLocation.EXPLICIT_UPPER_BOUND })
 public @interface ClassValBottom {
 }

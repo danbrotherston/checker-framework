@@ -6,8 +6,9 @@ public class Heuristics implements Comparable<Heuristics> {
      // Using == is OK if it's the first statement in the compare method,
      // it's comparing the arguments, and the return value is 0.
      public int compare(String s1, String s2) {
-       if (s1 == s2)
+       if (s1 == s2) {
          return 0;
+       }
        return String.CASE_INSENSITIVE_ORDER.compare(s1, s2);
      }
    }
@@ -18,6 +19,8 @@ public class Heuristics implements Comparable<Heuristics> {
     // Using == is OK if it's the first statement in the equals method
     // and it compares "this" against the argument.
     if (this == o) return true;
+    // Not the first statement in the method.
+    //:: error: (not.interned)
     if (o == this) return true;
     return false;
   }
@@ -29,6 +32,8 @@ public class Heuristics implements Comparable<Heuristics> {
     // and it compares "this" against the argument.
 
     if (o == this) return 0;
+    // Not the first statement in the method.
+    //:: error: (not.interned)
     if (this == o) return 0;
     return 0;
   }

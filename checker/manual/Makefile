@@ -20,11 +20,10 @@ propkey-checker.tex \
 signature-checker.tex \
 guieffect-checker.tex \
 units-checker.tex \
+signedness-checker.tex \
 constant-value-checker.tex \
 aliasing-checker.tex \
 linear-checker.tex \
-igj-checker.tex \
-javari-checker.tex \
 reflection-checker.tex \
 reflection-inference-rules.tex \
 subtyping-checker.tex \
@@ -33,22 +32,20 @@ typestate-checker.tex \
 generics.tex \
 advanced-features.tex \
 warnings.tex \
+inference.tex \
 annotating-libraries.tex \
 creating-a-checker.tex \
 external-tools.tex \
 faq.tex \
 troubleshooting.tex
 
-all: doc manual.pdf manual.html
+all: manual.pdf manual.html
 
 .PHONY: figures-all
 figures-all:
 	${MAKE} -C figures all
 
-doc:
-	ln -sf ../doc doc
-
-manual.pdf: bib-update figures-all
+manual.pdf: bib-update figures-all check-labels
 	pdflatex manual.tex
 	bibtex manual
 	pdflatex manual.tex
@@ -66,12 +63,19 @@ manual.html: manual.pdf CFLogo.png favicon-checkerframework.png
 # The below is not necessary since Hevea mkes good tables of contents itself.
 #	perl -pi -e 's/(<!--TOC section Introduction-->)/$$1\n\n<p>Contents:<\/p>\n<!-- start toc.  do not edit; run html-update-toc instead -->\n<!-- end toc -->\n\n<br>\n/' manual.html
 #	html-update-toc manual.html
+# Add CSS styling, since \newstyle doesn't work for me.
+	sed -i -e "s%<style type=\"text/css\">%<style type=\"text/css\">\nimg { max-width: 100\%; max-height: 100\%; }%" manual.html
 
 CFLogo.png: logo/Logo/CFLogo.png
 	cp -p $< $@
 
 favicon-checkerframework.png: logo/Checkmark/CFCheckmark_favicon.png
 	cp -p $< $@
+
+# Ensure that every section of the manual has a \label{} command.
+.PHONY: check-labels
+check-labels:
+	if grep -n --perl-regexp "\\\\((sub)*section|paragraph){[^#](?!.*\\\\label.*}})" *.tex ; then false ; else true ; fi
 
 export BIBINPUTS = $BIBINPUTS:.:bib
 bib:
@@ -90,7 +94,7 @@ endif
 
 # Leaves manual.html, and .svg files that it references.
 clean:
-	@\rm -f doc *.aux *.blg *.dvi *.haux *.htoc *.idx *.ilg *.ind *.log *.out *.pdf *.ps *.toc
+	@\rm -f *.aux *.blg *.dvi *.haux *.htoc *.idx *.ilg *.ind *.log *.out *.pdf *.ps *.toc
 
 very_clean: clean
 	@\rm manual.html CFLogo.png

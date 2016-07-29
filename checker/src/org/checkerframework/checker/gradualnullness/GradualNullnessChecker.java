@@ -6,13 +6,12 @@ import com.sun.source.util.Trees;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 
+import org.checkerframework.checker.nullness.NullnessChecker;
 import org.checkerframework.framework.gradual.*;
-import org.checkerframework.checker.nullness.AbstractNullnessFbcChecker;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.qual.Dynamic;
 import org.checkerframework.framework.qual.StubFiles;
-import org.checkerframework.framework.qual.TypeQualifiers;
 import org.checkerframework.javacutil.ErrorReporter;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -35,9 +34,8 @@ import java.util.TreeMap;
  * the normal defaults and uses dynamic any time untyped code is returning
  * a value.  It then performs runtime checks to ensure validity.
  */
-@TypeQualifiers({ Dynamic.class })
 @StubFiles("../nullness/astubs/gnu-getopt.astub")
-public class GradualNullnessChecker extends AbstractNullnessFbcChecker {
+public class GradualNullnessChecker extends NullnessChecker {
     @Override
     protected BaseTypeVisitor<?> createSourceVisitor() {
 	return new GradualNullnessVisitor(this, true);
@@ -67,6 +65,4 @@ public class GradualNullnessChecker extends AbstractNullnessFbcChecker {
     public boolean isGradualTypeSystem() {
 	return true;
     }
-
-
 }

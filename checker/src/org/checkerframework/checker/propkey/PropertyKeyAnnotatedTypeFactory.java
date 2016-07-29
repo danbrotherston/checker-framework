@@ -13,7 +13,6 @@ import org.checkerframework.checker.propkey.qual.PropertyKey;
 import org.checkerframework.checker.propkey.qual.PropertyKeyBottom;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
-import org.checkerframework.framework.qual.DefaultLocation;
 import org.checkerframework.framework.type.*;
 import org.checkerframework.framework.type.treeannotator.ImplicitsTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
@@ -48,7 +47,6 @@ public class PropertyKeyAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         PROPKEY_BOTTOM = AnnotationUtils.fromClass(elements, PropertyKeyBottom.class);
 
         this.postInit();
-        this.defaults.addAbsoluteDefault(PROPKEY_BOTTOM, DefaultLocation.LOWER_BOUNDS);
     }
 
     @Override

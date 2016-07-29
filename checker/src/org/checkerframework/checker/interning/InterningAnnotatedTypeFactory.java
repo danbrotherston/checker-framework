@@ -17,6 +17,7 @@ import org.checkerframework.framework.type.typeannotator.ListTypeAnnotator;
 import org.checkerframework.framework.type.typeannotator.TypeAnnotator;
 import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.ElementUtils;
+import org.checkerframework.javacutil.InternalUtils;
 import org.checkerframework.javacutil.TreeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -38,6 +39,7 @@ import com.sun.source.tree.Tree;
  * <li value="3">has an enum type
  * <li value="4">has a primitive type
  * <li value="5">has the type java.lang.Class
+ * <li value="6">is a use of a class declared to be @Interned</li>
  * </ol>
  *
  * This factory extends {@link BaseAnnotatedTypeFactory} and inherits its
@@ -67,9 +69,6 @@ public class InterningAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         addAliasedAnnotation(com.sun.istack.internal.Interned.class, INTERNED);
 
         this.postInit();
-
-        // The null literal is interned -> make Void interned also.
-        addTypeNameImplicit(java.lang.Void.class, INTERNED);
     }
 
     @Override
@@ -89,10 +88,20 @@ public class InterningAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     }
 
     @Override
-    public void annotateImplicit(Element element, AnnotatedTypeMirror type) {
-        if (!type.isAnnotatedInHierarchy(INTERNED) && ElementUtils.isCompileTimeConstant(element))
+    public void addComputedTypeAnnotations(Tree tree, AnnotatedTypeMirror type, boolean useFlow) {
+        Element element = InternalUtils.symbol(tree);
+        if (!type.isAnnotatedInHierarchy(INTERNED) && ElementUtils.isCompileTimeConstant(element)) {
             type.addAnnotation(INTERNED);
-        super.annotateImplicit(element, type);
+        }
+        super.addComputedTypeAnnotations(tree, type, useFlow);
+    }
+
+    @Override
+    public void addComputedTypeAnnotations(Element element, AnnotatedTypeMirror type) {
+        if (!type.isAnnotatedInHierarchy(INTERNED) && ElementUtils.isCompileTimeConstant(element)) {
+            type.addAnnotation(INTERNED);
+        }
+        super.addComputedTypeAnnotations(element, type);
     }
 
     /**
@@ -130,11 +139,10 @@ public class InterningAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     }
 
     /**
-     * A class for adding annotations to a type after initial type resolution.
+     * Adds @Interned to enum types and any use of a class that is declared to be @Interned
      */
     private class InterningTypeAnnotator extends TypeAnnotator {
 
-        /** Creates an {@link InterningTypeAnnotator} for the given checker. */
         InterningTypeAnnotator(InterningAnnotatedTypeFactory atypeFactory) {
             super(atypeFactory);
         }
@@ -147,7 +155,14 @@ public class InterningAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             assert elt != null;
             if (elt.getKind() == ElementKind.ENUM) {
                 t.replaceAnnotation(INTERNED);
-            } else if (InterningAnnotatedTypeFactory.this.fromElement(elt).hasAnnotation(INTERNED)) {
+
+            //TODO: CODE REVIEW:
+            //TODO: I am not sure this makes sense.  An element for a declared type doesn't always have
+            //TODO: to be a class declaration.  AND I would assume if the class declaration has
+            //TODO: @Interned then the type would already receive an @Interned from the framework without
+            //TODO: this case (I think from InheritFromClass)
+            //TODO: IF this is true, perhaps remove item 6 I added to the class comment
+            } else if (typeFactory.fromElement(elt).hasAnnotation(INTERNED)) {
                 // If the class/interface has an @Interned annotation, use it.
                 t.replaceAnnotation(INTERNED);
             }
@@ -156,6 +171,10 @@ public class InterningAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
         }
     }
 
+    /**
+     * Unbox type and replace any interning type annotations with @Interned since all
+     * all primitives can safely use ==. See case 4 in the class comments.
+     */
     @Override
     public AnnotatedPrimitiveType getUnboxedType(AnnotatedDeclaredType type) {
         AnnotatedPrimitiveType primitive = super.getUnboxedType(type);

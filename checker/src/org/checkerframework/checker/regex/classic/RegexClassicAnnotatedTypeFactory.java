@@ -4,6 +4,7 @@ import org.checkerframework.checker.regex.RegexUtil;
 import org.checkerframework.checker.regex.classic.qual.PartialRegex;
 import org.checkerframework.checker.regex.classic.qual.PolyRegex;
 import org.checkerframework.checker.regex.classic.qual.RegexBottom;
+import org.checkerframework.checker.regex.classic.qual.UnknownRegex;
 import org.checkerframework.checker.regex.qual.Regex;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.flow.CFStore;
@@ -26,7 +27,9 @@ import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.Pair;
 import org.checkerframework.javacutil.TreeUtils;
 
+import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -94,7 +97,7 @@ public class RegexClassicAnnotatedTypeFactory extends GenericAnnotatedTypeFactor
     /**
      * The value method of the PartialRegex qualifier.
      *
-     * @see org.checkerframework.checker.regex.qual.PartialRegex
+     * @see org.checkerframework.checker.regex.classic.qual.PartialRegex
      */
     private final ExecutableElement partialRegexValue;
 
@@ -140,6 +143,13 @@ public class RegexClassicAnnotatedTypeFactory extends GenericAnnotatedTypeFactor
          */
 
         this.postInit();
+    }
+
+    @Override
+    protected Set<Class<? extends Annotation>> createSupportedTypeQualifiers() {
+        return getBundledTypeQualifiersWithPolyAll(
+                Regex.class, PartialRegex.class,
+                RegexBottom.class, UnknownRegex.class);
     }
 
     @Override
@@ -245,7 +255,7 @@ public class RegexClassicAnnotatedTypeFactory extends GenericAnnotatedTypeFactor
      * We cannot directly use RegexUtil, because it uses type annotations
      * which cannot be used in IDEs (yet).
      */
-    /*@SuppressWarnings("purity")*/ // the checker cannot prove that the method is pure, but it is
+    @SuppressWarnings("purity") // the checker cannot prove that the method is pure, but it is
     /*@org.checkerframework.dataflow.qual.Pure*/
     private static boolean isRegex(String s) {
         try {
@@ -427,8 +437,8 @@ public class RegexClassicAnnotatedTypeFactory extends GenericAnnotatedTypeFactor
          * then visit their upper bounds to get the Regex annotation.  It's get "minimum" regex count
          * because, depending on the bounds of a typevar or wildcard, the actual type may have more than
          * the upper bound's count.
-         * @param type Type that may carry a Regex annotation
-         * @return The Integer value of the Regex annotation (0 if no value exists)
+         * @param type type that may carry a Regex annotation
+         * @return the Integer value of the Regex annotation (0 if no value exists)
          */
         private Integer getMinimumRegexCount(final AnnotatedTypeMirror type) {
             final AnnotationMirror primaryRegexAnno = type.getAnnotation(Regex.class);
@@ -445,8 +455,9 @@ public class RegexClassicAnnotatedTypeFactory extends GenericAnnotatedTypeFactor
                         for (final AnnotatedTypeMirror bound : ((AnnotatedIntersectionType) type).directSuperTypes()) {
                             Integer boundRegexNum = getMinimumRegexCount(bound);
                             if (boundRegexNum != null) {
-                                if (maxBound == null || boundRegexNum > maxBound)
+                                if (maxBound == null || boundRegexNum > maxBound) {
                                     maxBound = boundRegexNum;
+                                }
                             }
                         }
                         return maxBound;

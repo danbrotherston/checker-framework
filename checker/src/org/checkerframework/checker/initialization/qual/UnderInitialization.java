@@ -11,7 +11,6 @@ import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.nullness.NullnessChecker;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifier;
 
 /**
  * This type qualifier belongs to the freedom-before-commitment type-system for
@@ -50,14 +49,13 @@ import org.checkerframework.framework.qual.TypeQualifier;
  * currently not implemented), because there might be subclasses with
  * uninitialized fields. The following example shows why:
  *
- * <pre>
- * <code>
+ * <pre>{@code
  *   class A {
  *      &#64;NonNull String a;
  *      public A() {
  *          a = "";
  *          // Now, all fields of A are initialized.
- *          // However, if this constuctor is invoked as part of 'new B()', then
+ *          // However, if this constructor is invoked as part of 'new B()', then
  *          // the fields of B are not yet initialized.
  *          // If we would type 'this' as &#64;Initialized, then the following call is valid:
  *          foo();
@@ -74,12 +72,10 @@ import org.checkerframework.framework.qual.TypeQualifier;
  *          b.toString();
  *      }
  *   }
- * </code>
- * </pre>
+ * }</pre>
  *
  * @checker_framework.manual #initialization-checker Initialization Checker
  */
-@TypeQualifier
 @SubtypeOf(UnknownInitialization.class)
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,9 +1,11 @@
 package org.checkerframework.checker.nullness.qual;
 
-import java.lang.annotation.*;
-
-import org.checkerframework.checker.nullness.qual.KeyFor;
-import org.checkerframework.framework.qual.*;
+import org.checkerframework.framework.qual.PolymorphicQualifier;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * A polymorphic qualifier for the Map Key (@KeyFor) type system.
@@ -20,7 +22,6 @@ import org.checkerframework.framework.qual.*;
  * @checker_framework.manual #nullness-checker Nullness Checker
  */
 @Documented
-@TypeQualifier
 @PolymorphicQualifier(UnknownKeyFor.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})

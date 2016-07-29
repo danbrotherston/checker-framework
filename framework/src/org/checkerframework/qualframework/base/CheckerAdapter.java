@@ -6,7 +6,7 @@ import org.checkerframework.checker.compilermsgs.qual.CompilerMessageKey;
 
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
-import org.checkerframework.framework.qual.DefaultLocation;
+import org.checkerframework.framework.qual.TypeUseLocation;
 import org.checkerframework.framework.type.AnnotatedTypeFormatter;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.util.AnnotationFormatter;
@@ -123,8 +123,8 @@ public class CheckerAdapter<Q> extends BaseTypeChecker {
         }
 
         @Override
-        public String format(AnnotatedTypeMirror type, boolean printInvisibles) {
-            return qualifiedTypeFormatter.format(getTypeMirrorConverter().getQualifiedType(type), printInvisibles);
+        public String format(AnnotatedTypeMirror type, boolean printVerbose) {
+            return qualifiedTypeFormatter.format(getTypeMirrorConverter().getQualifiedType(type), printVerbose);
         }
 
         @Override
@@ -164,13 +164,13 @@ public class CheckerAdapter<Q> extends BaseTypeChecker {
     }
 
     public void setupDefaults(QualifierDefaults defaults) {
-        defaults.addAbsoluteDefault(
+        defaults.addCheckedCodeDefault(
                 getTypeMirrorConverter().getAnnotation(
                         underlying.getTypeFactory().getQualifierHierarchy().getBottom()),
-                DefaultLocation.IMPLICIT_LOWER_BOUNDS);
-        defaults.addAbsoluteDefault(
+                TypeUseLocation.IMPLICIT_LOWER_BOUND);
+        defaults.addCheckedCodeDefault(
                 getTypeMirrorConverter().getAnnotation(
                         underlying.getTypeFactory().getQualifierHierarchy().getTop()),
-                DefaultLocation.LOCAL_VARIABLE);
+                TypeUseLocation.LOCAL_VARIABLE);
     }
 }

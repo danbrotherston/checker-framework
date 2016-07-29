@@ -7,13 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.checkerframework.checker.nullness.NullnessRawnessChecker;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.NonRaw;
-import org.checkerframework.checker.nullness.qual.Raw;
 import org.checkerframework.framework.qual.DefaultFor;
-import org.checkerframework.framework.qual.DefaultLocation;
+import org.checkerframework.framework.qual.TypeUseLocation;
 import org.checkerframework.framework.qual.SubtypeOf;
-import org.checkerframework.framework.qual.TypeQualifier;
 
 /**
  * This type qualifier belongs to the rawness type-system for tracking
@@ -63,14 +59,13 @@ import org.checkerframework.framework.qual.TypeQualifier;
  * currently not implemented), because there might be subclasses with
  * uninitialized fields. The following example shows why:
  *
- * <pre>
- * <code>
+ * <pre>{@code
  *   class A {
  *      &#64;NonNull String a;
  *      public A() {
  *          a = "";
  *          // Now, all fields of A are initialized.
- *          // However, if this constuctor is invoked as part of 'new B()', then
+ *          // However, if this constructor is invoked as part of 'new B()', then
  *          // the fields of B are not yet initialized.
  *          // If we would type 'this' as &#64;NonRaw, then the following call is valid:
  *          foo();
@@ -87,14 +82,12 @@ import org.checkerframework.framework.qual.TypeQualifier;
  *          b.toString();
  *      }
  *   }
- * </code>
- * </pre>
+ * }</pre>
  *
  * @checker_framework.manual #nullness-checker Nullness Checker
  */
-@TypeQualifier
 @SubtypeOf({})
-@DefaultFor({ DefaultLocation.LOCAL_VARIABLE, DefaultLocation.RESOURCE_VARIABLE })
+@DefaultFor({ TypeUseLocation.LOCAL_VARIABLE, TypeUseLocation.RESOURCE_VARIABLE })
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE_USE, ElementType.TYPE_PARAMETER })

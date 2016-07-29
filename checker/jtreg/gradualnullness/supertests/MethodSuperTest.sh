@@ -12,7 +12,7 @@ fi
 
 set -e
 
-$TESTSRC/../../../bin/javac -d $TESTCLASSES -processor org.checkerframework.checker.gradualnullness.GradualNullnessChecker $TESTSRC/MethodSuperTest.java $TESTSRC/MethodSuperTestParent.java
+$TESTSRC/../../../bin/javac -cp $TESTSRC/../../../dist/checker.jar -d $TESTCLASSES -processor org.checkerframework.checker.gradualnullness.GradualNullnessChecker $TESTSRC/MethodSuperTest.java $TESTSRC/MethodSuperTestParent.java
 
 javap -c $TESTCLASSES/MethodSuperTest.class | grep -q "[0-9]*: invokespecial #[0-9]*[[:space:]]*// Method MethodSuperTestParent.f_\$safe:(Ljava/lang/Integer;)Ljava/lang/Integer;"
 

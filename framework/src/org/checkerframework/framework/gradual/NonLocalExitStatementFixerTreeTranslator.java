@@ -111,7 +111,7 @@ public class NonLocalExitStatementFixerTreeTranslator<Checker extends BaseTypeCh
 	super.visitSwitch(that);
 	loopStack.pop();
     }
-    
+
     @Override
     public void visitBreak(JCTree.JCBreak that) {
 	if (!loopStack.empty()) {

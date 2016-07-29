@@ -1,27 +1,29 @@
 package org.checkerframework.checker.regex.classic.qual;
 
-import java.lang.annotation.Target;
-
 import org.checkerframework.checker.regex.qual.Regex;
-import org.checkerframework.framework.qual.*;
+import org.checkerframework.framework.qual.DefaultFor;
+import org.checkerframework.framework.qual.ImplicitFor;
+import org.checkerframework.framework.qual.InvisibleQualifier;
+import org.checkerframework.framework.qual.LiteralKind;
+import org.checkerframework.framework.qual.SubtypeOf;
+import org.checkerframework.framework.qual.TargetLocations;
+import org.checkerframework.framework.qual.TypeUseLocation;
 
-import com.sun.source.tree.Tree;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 
 /**
  * Represents the bottom of the Regex qualifier hierarchy. This is used to make
  * the null literal a subtype of all Regex annotations.
- * <p>
- *
- * This annotation may not be written in source code; it is an
- * implementation detail of the checker.
  *
  * @checker_framework.manual #regex-checker Regex Checker
  */
-@TypeQualifier
 @InvisibleQualifier
-@ImplicitFor(trees = {Tree.Kind.NULL_LITERAL},
+@ImplicitFor(literals = {LiteralKind.NULL},
   typeNames = {java.lang.Void.class})
 @SubtypeOf({Regex.class, PartialRegex.class})
-@DefaultFor(value={DefaultLocation.LOWER_BOUNDS})
-@Target({}) // empty target prevents programmers from writing this in a program
+@DefaultFor(value={ TypeUseLocation.LOWER_BOUND })
+@Target({ ElementType.TYPE_USE, ElementType.TYPE_PARAMETER })
+@TargetLocations({ TypeUseLocation.EXPLICIT_LOWER_BOUND,
+    TypeUseLocation.EXPLICIT_UPPER_BOUND })
 public @interface RegexBottom {}

@@ -44,7 +44,7 @@ public class RuntimeCheckInserterTreeTranslator<Checker extends BaseTypeChecker>
      * Builder to create runtime checks for the locations which need a check.
      */
     RuntimeCheckBuilder<Checker> checkBuilder = null;
-    
+
     /**
      * Locations which need runtime checks added.
      */
@@ -378,7 +378,7 @@ public class RuntimeCheckInserterTreeTranslator<Checker extends BaseTypeChecker>
 	// in the replacement tree.
 	return that;
     }
-    
+
     /**
      * Gets the owner of a given Tree node (using the stack), in order to create
      * and properly own symbols.

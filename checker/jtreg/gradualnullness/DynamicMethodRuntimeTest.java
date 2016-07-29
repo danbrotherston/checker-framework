@@ -15,7 +15,7 @@ public class DynamicMethodRuntimeTest {
     DynamicMethodRuntimeTest foo = new DynamicMethodRuntimeTest();
     try {
       foo.a();
-    } catch(RuntimeException e) {
+    } catch (RuntimeException e) {
       System.out.println("Success");
     }
   }

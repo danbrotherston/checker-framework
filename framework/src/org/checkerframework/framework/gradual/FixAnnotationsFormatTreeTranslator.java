@@ -124,7 +124,7 @@ public class FixAnnotationsFormatTreeTranslator<Checker extends BaseTypeChecker>
 	result = tree;
     }
 
-    
+
     /*
     @Override
     public void visitLiteral(JCTree.JCLiteral tree) {

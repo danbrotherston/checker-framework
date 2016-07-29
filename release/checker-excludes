@@ -1,5 +1,11 @@
+api/**
 checker/bin/README
 checker/bin/javac
-checker/bin/javac_maven
 checker/checker/bin-devel/javac
 checker/dist/*.asc
+tutorial/tests/**
+tutorial/eclipse-projects/**
+tutorial/src/**
+tutorial/test/**
+tutorial/Makefile
+tutorial/README

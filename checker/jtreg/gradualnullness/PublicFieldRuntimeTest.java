@@ -20,7 +20,7 @@ public class PublicFieldRuntimeTest {
     try {
       PublicFieldRuntimeTestUncheckedPart.setField(foo);
       foo.a();
-    } catch(RuntimeException e) {
+    } catch (RuntimeException e) {
       System.out.println("Success");
     }
   }

@@ -265,14 +265,14 @@ public class GeneralTreeTranslator<Checker extends BaseTypeChecker>
     public void visitApply(JCMethodInvocation that) {
 	aboutToVisitTree(that);
 	super.visitApply(that);
-	visitTree(that); 
+	visitTree(that);
     }
 
     @Override
     public void visitNewClass(JCNewClass that) {
 	aboutToVisitTree(that);
 	super.visitNewClass(that);
-	visitTree(that); 
+	visitTree(that);
     }
 
     @Override

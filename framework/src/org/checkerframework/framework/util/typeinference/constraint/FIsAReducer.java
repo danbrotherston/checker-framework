@@ -65,7 +65,7 @@ public class FIsAReducer implements AFReducer {
      *  If F = Tj, then the constraint Tj = A is implied.
      *  If F = U[], where the type U involves Tj, then if A is an array type V[], or a type variable with an
      *  upper bound that is an array type V[], where V is a reference type, this algorithm is applied recursively
-     *  to the constraint V >> U. Otherwise, no constraint is implied on Tj.
+     *  to the constraint {@code V >> U}. Otherwise, no constraint is implied on Tj.
      *
      *  Since both F and A may have component types this visitor delves into their components
      *  and applies these rules to the components.  However, only one step is taken at a time (i.e. this
@@ -80,7 +80,7 @@ public class FIsAReducer implements AFReducer {
                  + "constraints=[\n" + PluginUtil.join(", ", afConstraints) + "\n]";
         }
         //------------------------------------------------------------------------
-        //Arrays as arguments
+        // Arrays as arguments
 
         @Override
         public Void visitArray_Array(AnnotatedArrayType parameter, AnnotatedArrayType argument, Set<AFConstraint> constraints) {
@@ -105,10 +105,10 @@ public class FIsAReducer implements AFReducer {
         }
 
         //------------------------------------------------------------------------
-        //Declared as argument
+        // Declared as argument
         @Override
         public Void visitDeclared_Array(AnnotatedDeclaredType parameter, AnnotatedArrayType argument, Set<AFConstraint> constraints) {
-            //should this be Array<String> - T[] the new A2F(String, T)
+            // should this be Array<String> - T[] the new A2F(String, T)
             return null;
         }
 
@@ -175,17 +175,17 @@ public class FIsAReducer implements AFReducer {
 
         @Override
         public Void visitNull_Null(AnnotatedNullType parameter, AnnotatedNullType argument, Set<AFConstraint> afConstraints) {
-            //we sometimes get these when we have captured types passed as arguments
-            //regardless they don't give any information
+            // we sometimes get these when we have captured types passed as arguments
+            // regardless they don't give any information
             return null;
         }
 
         //------------------------------------------------------------------------
-        //Primitive as argument
+        // Primitive as argument
         @Override
         public Void visitPrimitive_Declared(AnnotatedPrimitiveType parameter, AnnotatedDeclaredType argument, Set<AFConstraint> constraints) {
-            //we may be able to eliminate this case, since I believe the corresponding constraint will just be discarded
-            //as the parameter must be a boxed primitive
+            // we may be able to eliminate this case, since I believe the corresponding constraint will just be discarded
+            // as the parameter must be a boxed primitive
             constraints.add(new FIsA(typeFactory.getBoxedType(parameter), argument));
             return null;
         }
@@ -197,8 +197,8 @@ public class FIsAReducer implements AFReducer {
 
         @Override
         public Void visitTypevar_Typevar(AnnotatedTypeVariable parameter, AnnotatedTypeVariable argument, Set<AFConstraint> constraints) {
-            //if we've reached this point and the two are corresponding type variables, then they are NOT ones that
-            //may have a type variable we are inferring types for and therefore we can discard this constraint
+            // if we've reached this point and the two are corresponding type variables, then they are NOT ones that
+            // may have a type variable we are inferring types for and therefore we can discard this constraint
             return null;
         }
 

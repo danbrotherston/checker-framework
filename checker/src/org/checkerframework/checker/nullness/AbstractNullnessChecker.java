@@ -4,7 +4,6 @@ import org.checkerframework.checker.initialization.InitializationChecker;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
-import org.checkerframework.framework.qual.StubFiles;
 import org.checkerframework.framework.source.SupportedLintOptions;
 
 import java.util.Collection;
@@ -24,10 +23,9 @@ import java.util.LinkedHashSet;
     // Forbidding is sound and will eventually be the only possibility.
     // Allowing is unsound, as described in Section 3.3.4, "Nullness and arrays":
     //     http://types.cs.washington.edu/checker-framework/current/checker-framework-manual.html#nullness-arrays
-    // It is permitted temporarily, until we gathered more experience
+    // It is permitted temporarily, until we gather more experience.
     // See issues 154, 322, and 433.
     "forbidnonnullarraycomponents" })
-@StubFiles("astubs/gnu-getopt.astub")
 public abstract class AbstractNullnessChecker extends InitializationChecker {
 
     /**

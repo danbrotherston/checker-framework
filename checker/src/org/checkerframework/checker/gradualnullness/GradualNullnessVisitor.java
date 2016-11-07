@@ -56,6 +56,11 @@ public class GradualNullnessVisitor extends NullnessVisitor {
 	    // Thread.dumpStack();
 	    if (this.inMethod) {
 		if (varType.hasAnnotation(NONNULL)) {
+		    //		    if (valueTree.toString().equals("?")) {
+		    //System.err.println("ADDING WILDCARD");
+		    //	Thread.dumpStack();
+			//System.exit(-1);
+		    //}
 		    //System.err.println("Adding check location");
 		    existingCheckedValues.add(valueTree);
 		    runtimeCheckLocations.put(getCurrentPath(),

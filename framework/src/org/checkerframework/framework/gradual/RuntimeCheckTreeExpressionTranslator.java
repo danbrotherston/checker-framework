@@ -101,8 +101,9 @@ public class RuntimeCheckTreeExpressionTranslator<Checker extends BaseTypeChecke
     @Override
     public void visitTree(JCTree that) {
 	if (this.replacementLocations.containsKey(that)) {
+	    System.err.println("Old: " + that);
 	    result = buildTestCall(that);
-	    System.err.println("Old: " + that + " new: " + result);
+	    //System.err.println("Old: " + that + " new: " + result);
 	} else {
 	    result = that;
 	}
@@ -113,6 +114,11 @@ public class RuntimeCheckTreeExpressionTranslator<Checker extends BaseTypeChecke
         System.err.println("TESTINSERTED");
 	AnnotatedTypeMirror type = this.replacementLocations.get(that);
 	String literalType = type.toString();
+	if (literalType.contains("[")) {
+	    System.err.println("ADDINGARRAYCHECK");
+	} else if (literalType.contains("<")) {
+	    System.err.println("ADDINGGENERICCHECK");
+	}
 	JCTree.JCExpression methodCall = maker.Apply(null, checkerFunction,
 						     List.of((JCTree.JCExpression)that,
 							     maker.Literal(literalType)));
@@ -120,6 +126,7 @@ public class RuntimeCheckTreeExpressionTranslator<Checker extends BaseTypeChecke
 	    maker.TypeCast(that.type, methodCall);
 							
 	//	attr.attribExpr(methodCall, this.getAttrEnv(that), that.getType());
+	System.err.println("New Method Call: " + castMethodCall);
 	this.attribute(castMethodCall,
 		       (JCTree.JCExpression)that);
 	return castMethodCall;

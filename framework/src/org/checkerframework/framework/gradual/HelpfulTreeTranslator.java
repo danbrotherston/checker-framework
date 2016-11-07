@@ -20,6 +20,7 @@ import com.sun.tools.javac.util.Name;
 import com.sun.tools.javac.util.Log;
 import com.sun.tools.javac.util.Names;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.tree.TreeCopier;
 import com.sun.tools.javac.code.Flags;

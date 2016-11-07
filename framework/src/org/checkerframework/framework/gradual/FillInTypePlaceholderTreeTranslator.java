@@ -172,6 +172,11 @@ public class FillInTypePlaceholderTreeTranslator<Checker extends BaseTypeChecker
 		this.revertArg = this.getCurrentArg();
 	    }
 	    result = maker.Literal(type.toString());
+	    if (type.toString().contains("[")) {
+		System.err.println("ARRAYTESTINSERTED");
+	    } else if (type.toString().contains("<")) {
+		System.err.println("GENERICTESTINSERTED");
+	    }
 	    //result = maker.Literal(getCurrentParamType());
 	    // System.out.println("Replacing with: " + result.getValue());
 	} else {

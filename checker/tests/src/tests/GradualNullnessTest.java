@@ -1,13 +1,13 @@
 package tests;
 
 import org.checkerframework.checker.nullness.AbstractNullnessChecker;
-import org.checkerframework.framework.test.ParameterizedCheckerTest;
+import org.checkerframework.framework.test.CheckerFrameworkTest;
 import org.junit.runners.Parameterized.Parameters;
 
 import java.io.File;
 import java.util.Collection;
 
-public class GradualNullnessTest extends ParameterizedCheckerTest {
+public class GradualNullnessTest extends CheckerFrameworkTest {
 
     public GradualNullnessTest(File testFile) {
         super(testFile,
@@ -20,7 +20,7 @@ public class GradualNullnessTest extends ParameterizedCheckerTest {
     }
 
     @Parameters
-    public static Collection<Object[]> data() {
-        return testFiles("gradualnullness");
+    public static String[] getTestDirs() {
+        return new String[]{"gradualnullness"};
     }
 }

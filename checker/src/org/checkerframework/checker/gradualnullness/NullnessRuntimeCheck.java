@@ -27,6 +27,11 @@ public class NullnessRuntimeCheck {
 	/*return true;*/
 
 		System.err.println("RUNTIMECHECK");
+		if (type.contains("[")) {
+		    System.err.println("ARRAYCHECK");
+		} else if (type.contains("<")) {
+		    System.err.println("GENERICCHECK");
+		}
 
 	/*	      type = type.contains("<") ? type.substring(0, type.indexOf("<")) : type;
       boolean nullable = type.contains("Nullable") || type.contains("PolyNull");
